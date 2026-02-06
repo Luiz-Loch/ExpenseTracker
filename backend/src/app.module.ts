@@ -8,7 +8,7 @@ import { PostgresConfigService } from './configuration/postgres.config.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../.env',
+      envFilePath: './.env',
     }),
     TypeOrmModule.forRootAsync({
       useClass: PostgresConfigService,

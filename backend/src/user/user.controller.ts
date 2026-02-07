@@ -1,7 +1,8 @@
-import { Controller, Get, Body, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Delete, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserUpdateDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/response-user.dto';
+import { UserCreateDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -10,19 +11,24 @@ export class UserController {
     private readonly userService: UserService
   ) { }
 
-  // @Get('me')
-  // public async findMe(id: string): Promise<UserResponseDto> {
-  //   return new UserResponseDto(await this.userService.findOne(id));
-  // }
+  @Post()
+  public async create(@Body() userCreateDto: UserCreateDto): Promise<UserResponseDto> {
+    return new UserResponseDto(await this.userService.create(userCreateDto));
+  }
 
-  // @Patch('me')
-  // public async updateMe(id: string, @Body() userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
-  //   return new UserResponseDto(await this.userService.update(id, userUpdateDto));
-  // }
+  @Get('me')
+  public async findMe(id: string): Promise<UserResponseDto> {
+    return new UserResponseDto(await this.userService.findOne(id));
+  }
 
-  // @Delete('me')
-  // public async deleteMe(id: string): Promise<void> {
-  //   return this.userService.remove(id);
-  // }
+  @Patch('me/')
+  public async updateMe(id: string, @Body() userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
+    return new UserResponseDto(await this.userService.update(id, userUpdateDto));
+  }
+
+  @Delete('me/')
+  public async deleteMe(id: string): Promise<void> {
+    return this.userService.remove(id);
+  }
 
 }

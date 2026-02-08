@@ -9,7 +9,7 @@ const configService = new ConfigService();
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: configService.getOrThrow<string>('PG_HOST'),
-  port: configService.getOrThrow<number>('PG_PORT'),
+  port: Number(configService.getOrThrow<number>('PG_PORT')),
   username: configService.getOrThrow<string>('PG_USERNAME'),
   password: configService.getOrThrow<string>('PG_PASSWORD'),
   database: configService.getOrThrow<string>('PG_DATABASE'),

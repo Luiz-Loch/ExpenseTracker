@@ -7,22 +7,22 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   public readonly id: string;
 
-  @Column({ nullable: false, length: 100 })
+  @Column({ name: 'name', nullable: false, length: 100 })
   public name: string;
 
-  @Column({ nullable: false, length: 100, unique: true })
+  @Column({ name: 'email', nullable: false, length: 100, unique: true })
   public email: string;
 
-  @Column({ nullable: false, length: 255 })
+  @Column({ name: 'password_hash', nullable: false, length: 255 })
   public passwordHash: string;
 
-  @CreateDateColumn({ nullable: false, type: 'timestamptz' })
+  @CreateDateColumn({ name: 'created_at', nullable: false, type: 'timestamptz' })
   public createdAt: Date;
 
-  @UpdateDateColumn({ nullable: false, type: 'timestamptz' })
+  @UpdateDateColumn({ name: 'updated_at', nullable: false, type: 'timestamptz' })
   public updatedAt: Date;
 
-  @DeleteDateColumn({ nullable: true, type: 'timestamptz' })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true, type: 'timestamptz' })
   public deletedAt?: Date;
 
   public update(userUpdateDto: UserUpdateDto): User {

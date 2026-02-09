@@ -1,26 +1,91 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { IsNull, Repository } from 'typeorm';
+import { Body, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Category } from './entities/category.entity';
+import { User } from '../user/entities/user.entity';
+import { CATEGORY_CREATE_VALIDATORS, CATEGORY_UPDATE_VALIDATORS } from './validations/tokens';
+import { CategoryCreateValidator } from './validations/create/category-create.validator';
+import { CategoryUpdateValidator } from './validations/update/category-update.validator';
+import { CategoryCreateDto } from './dto/create-category.dto';
+import { CategoryUpdateDto } from './dto/update-category.dto';
+
 
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+
+  public constructor(
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
+    @Inject(CATEGORY_CREATE_VALIDATORS)
+    private readonly createValidators: Array<CategoryCreateValidator>,
+
+    @Inject(CATEGORY_UPDATE_VALIDATORS)
+    private readonly updateValidators: Array<CategoryUpdateValidator>,
+  ) { }
+
+  public async create(userId: string, categoryCreateDto: CategoryCreateDto): Promise<Category> {
+    for (const validator of this.createValidators) {
+      await validator.validate(userId, categoryCreateDto);
+    }
+
+    const user: User = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+    });
+
+    const category: Category = this.categoryRepository.create({
+      user: user,
+      name: categoryCreateDto.name.trim(),
+      type: categoryCreateDto.type,
+    });
+
+    return this.categoryRepository.save(category);
   }
 
-  findAll() {
-    return `This action returns all category`;
+  public async findAll(userId: string): Promise<Array<Category>> {
+    return this.categoryRepository.find({
+      where: {
+        user: { id: userId },
+        deletedAt: IsNull(),
+      },
+      order: { name: 'ASC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  public async findOne(userId: string, id: string): Promise<Category> {
+    const category: Category | null = await this.categoryRepository.findOne({
+      where: {
+        id,
+        user: { id: userId },
+        deletedAt: IsNull(),
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  public async update(userId: string, id: string, categoryUpdateDto: CategoryUpdateDto): Promise<Category> {
+    const category: Category = await this.findOne(userId, id);
+
+    for (const validator of this.updateValidators) {
+      await validator.validate(userId, id, categoryUpdateDto);
+    }
+
+    category.update(categoryUpdateDto);
+
+    return this.categoryRepository.save(category);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  public async remove(userId: string, id: string): Promise<void> {
+    const category: Category = await this.findOne(userId, id);
+
+    await this.categoryRepository.softRemove(category);
   }
 }

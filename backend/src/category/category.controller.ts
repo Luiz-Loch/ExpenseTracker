@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryCreateDto } from './dto/create-category.dto';
+import { CategoryUpdateDto } from './dto/update-category.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
+import { CategoryResponseDto } from './dto/response-category.dto';
 
-@Controller('category')
+@Controller('categories')
+@UseGuards(JwtAuthGuard)
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+  ) { }
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  public async create(
+    @CurrentUserId() userId: string,
+    @Body() categoryCreateDto: CategoryCreateDto,
+  ): Promise<CategoryResponseDto> {
+    const category = await this.categoryService.create(userId, categoryCreateDto);
+    return new CategoryResponseDto(category);
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  public async findAll(@CurrentUserId() userId: string): Promise<Array<CategoryResponseDto>> {
+    const categories = await this.categoryService.findAll(userId);
+    return categories.map(category => new CategoryResponseDto(category));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  public async findOne(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+  ): Promise<CategoryResponseDto> {
+    const category = await this.categoryService.findOne(userId, id);
+    return new CategoryResponseDto(category);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  public async update(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+    @Body() categoryUpdateDto: CategoryUpdateDto,
+  ): Promise<CategoryResponseDto> {
+    const category = await this.categoryService.update(userId, id, categoryUpdateDto);
+    return new CategoryResponseDto(category);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  public async remove(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return await this.categoryService.remove(userId, id);
   }
 }

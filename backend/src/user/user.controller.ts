@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { UserUpdateDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/response-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUserId } from 'src/common/decorators/current-user-id.decorator';
+import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -15,17 +15,19 @@ export class UserController {
 
   @Get('me')
   public async findMe(@CurrentUserId() id: string): Promise<UserResponseDto> {
-    return new UserResponseDto(await this.userService.findOne(id));
+    const user = await this.userService.findOne(id);
+    return new UserResponseDto(user);
   }
 
   @Patch('me')
   public async updateMe(@CurrentUserId() id: string, @Body() userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
-    return new UserResponseDto(await this.userService.update(id, userUpdateDto));
+    const user = await this.userService.update(id, userUpdateDto);
+    return new UserResponseDto(user);
   }
 
   @Delete('me')
   public async deleteMe(@CurrentUserId() id: string): Promise<void> {
-    return this.userService.remove(id);
+    return await this.userService.remove(id);
   }
 
 }

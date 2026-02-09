@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { USER_CREATE_VALIDATORS, USER_UPDATE_VALIDATORS } from './validations/tokens';
 import { UserCreateValidator } from './validations/create/user-create.validator';
 import { UserUpdateValidator } from './validations/update/user-update.validator';
@@ -15,7 +15,7 @@ export class UserService {
 
   public constructor(
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
 
     @Inject(USER_CREATE_VALIDATORS)
     private readonly createValidators: Array<UserCreateValidator>,
@@ -29,17 +29,17 @@ export class UserService {
       await validator.validate(userCreateDto);
     }
 
-    const user: User = this.usersRepository.create({
+    const user: User = this.userRepository.create({
       name: userCreateDto.name,
       email: userCreateDto.email,
       passwordHash: userCreateDto.passwordHash
     });
 
-    return this.usersRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   public async findOne(id: string): Promise<User> {
-    const user: User | null = await this.usersRepository.findOne({
+    const user: User | null = await this.userRepository.findOne({
       where: { id },
     });
 
@@ -59,16 +59,16 @@ export class UserService {
 
     user.update(userUpdateDto);
 
-    return this.usersRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   public async remove(id: string): Promise<void> {
     const user: User = await this.findOne(id);
 
-    await this.usersRepository.softDelete(id);
+    await this.userRepository.softDelete(id);
   }
 
-  public async updatePassword(id: string, userUpdatePasswordDto: UserUpdatePasswordDto){
+  public async updatePassword(id: string, userUpdatePasswordDto: UserUpdatePasswordDto): Promise<void> {
     const user: User = await this.findOne(id);
 
   }

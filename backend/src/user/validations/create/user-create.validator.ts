@@ -1,4 +1,4 @@
-import { UserCreate } from 'src/user/types/create-user.type';
+import { UserCreate } from '../../types/create-user.type';
 
 export interface UserCreateValidator {
 

@@ -1,4 +1,4 @@
-import { UserUpdateDto } from 'src/user/dto/update-user.dto';
+import { UserUpdateDto } from '../../dto/update-user.dto';
 
 export interface UserUpdateValidator {
 

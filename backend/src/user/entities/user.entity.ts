@@ -1,7 +1,13 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserUpdateDto } from "../dto/update-user.dto";
 
-@Entity('users')
+@Entity({ name: 'users' })
+@Index(
+  ['email'],
+  { unique: true,
+    where: 'deleted_at IS NULL',
+  }
+)
 export class User {
 
   @PrimaryGeneratedColumn('uuid')
@@ -10,7 +16,7 @@ export class User {
   @Column({ name: 'name', nullable: false, length: 100 })
   public name: string;
 
-  @Column({ name: 'email', nullable: false, length: 100, unique: true })
+  @Column({ name: 'email', nullable: false, length: 100 })
   public email: string;
 
   @Column({ name: 'password_hash', nullable: false, length: 255 })
@@ -27,13 +33,18 @@ export class User {
 
   public update(userUpdateDto: UserUpdateDto): User {
     if (userUpdateDto.name !== undefined) {
-      this.name = userUpdateDto.name.toLowerCase().trim();
+      this.name = userUpdateDto.name.trim();
     }
 
     if (userUpdateDto.email !== undefined) {
       this.email = userUpdateDto.email.toLowerCase().trim();
     }
 
+    return this;
+  }
+
+  public updatePassword(newPasswordHash: string): User {
+    this.passwordHash = newPasswordHash;
     return this;
   }
 }

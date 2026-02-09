@@ -14,7 +14,7 @@ export class PostgresConfigService
     return {
       type: 'postgres',
       host: this.configService.getOrThrow<string>('PG_HOST'),
-      port: this.configService.getOrThrow<number>('PG_PORT'),
+      port: Number(this.configService.getOrThrow<number>('PG_PORT')),
       username: this.configService.getOrThrow<string>('PG_USERNAME'),
       password: this.configService.getOrThrow<string>('PG_PASSWORD'),
       database: this.configService.getOrThrow<string>('PG_DATABASE'),

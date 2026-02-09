@@ -1,12 +1,13 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { UserCreateDto } from './dto/create-user.dto';
-import { UserUpdateDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { USER_CREATE_VALIDATORS, USER_UPDATE_VALIDATORS } from './validations/tokens';
 import { UserCreateValidator } from './validations/create/user-create.validator';
 import { UserUpdateValidator } from './validations/update/user-update.validator';
+import { UserUpdatePasswordDto } from './dto/update-password-user.dt';
+import { UserUpdateDto } from './dto/update-user.dto';
+import { UserCreate } from './types/create-user.type';
 
 
 @Injectable()
@@ -23,16 +24,15 @@ export class UserService {
     private readonly updateValidators: Array<UserUpdateValidator>,
   ) { }
 
-  public async create(userCreateDto: UserCreateDto): Promise<User> {
-    // Validate the user creation DTO using the injected validators
-    for (const v of this.createValidators) {
-      await v.validate(userCreateDto);
+  public async create(userCreateDto: UserCreate): Promise<User> {
+    for (const validator of this.createValidators) {
+      await validator.validate(userCreateDto);
     }
 
     const user: User = this.usersRepository.create({
-      name: userCreateDto.name.trim(),
-      email: userCreateDto.email.toLowerCase().trim(),
-      passwordHash: userCreateDto.password // TODO: Hash the password before saving
+      name: userCreateDto.name,
+      email: userCreateDto.email,
+      passwordHash: userCreateDto.passwordHash
     });
 
     return this.usersRepository.save(user);
@@ -66,6 +66,11 @@ export class UserService {
     const user: User = await this.findOne(id);
 
     await this.usersRepository.softDelete(id);
+  }
+
+  public async updatePassword(id: string, userUpdatePasswordDto: UserUpdatePasswordDto){
+    const user: User = await this.findOne(id);
+
   }
 
 }

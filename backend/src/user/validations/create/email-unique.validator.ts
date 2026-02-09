@@ -2,8 +2,8 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { UserCreateDto } from '../../dto/create-user.dto';
 import { UserCreateValidator } from './user-create.validator';
+import { UserCreate } from 'src/user/types/create-user.type';
 
 @Injectable()
 export class EmailUniqueValidator
@@ -14,8 +14,8 @@ export class EmailUniqueValidator
     private readonly usersRepository: Repository<User>,
   ) { }
 
-  public async validate(userCreateDto: UserCreateDto): Promise<void> {
-    const email = userCreateDto.email.toLowerCase().trim();
+  public async validate(user: UserCreate): Promise<void> {
+    const email = user.email;
 
     const existing = await this.usersRepository.existsBy({ email });
 

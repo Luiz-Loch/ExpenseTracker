@@ -1,7 +1,6 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { CategoryType } from "../enums/category-type.enum";
 import { User } from "../../user/entities/user.entity";
-import { CategoryUpdateDto } from "../dto/update-category.dto";
+import { CategoryPatchDto } from "../dto/patch-category.dto";
 
 @Entity({ name: 'categories' })
 @Index(
@@ -22,9 +21,6 @@ export class Category {
   @Column({ name: 'name', nullable: false, length: 100 })
   name: string;
 
-  @Column({ name: 'type', nullable: false, type: 'enum', enum: CategoryType })
-  type: CategoryType;
-
   @CreateDateColumn({ name: 'created_at', nullable: false, type: 'timestamptz' })
   createdAt: Date;
 
@@ -34,13 +30,9 @@ export class Category {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true, type: 'timestamptz' })
   deletedAt?: Date;
 
-  public update(categoryUpdateDto: CategoryUpdateDto): Category {
-    if (categoryUpdateDto.name !== undefined) {
-      this.name = categoryUpdateDto.name.trim();
-    }
-
-    if (categoryUpdateDto.type !== undefined) {
-      this.type = categoryUpdateDto.type;
+  public update(categoryPatchDto: CategoryPatchDto): Category {
+    if (categoryPatchDto.name !== undefined && categoryPatchDto.name !== null) {
+      this.name = categoryPatchDto.name.trim();
     }
 
     return this;

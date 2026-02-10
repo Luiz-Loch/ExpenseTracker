@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserUpdateDto } from "../dto/update-user.dto";
+import { UserPatchDto } from "../dto/patch-user.dto";
 
 @Entity({ name: 'users' })
 @Index(
@@ -31,13 +31,13 @@ export class User {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true, type: 'timestamptz' })
   public deletedAt?: Date;
 
-  public update(userUpdateDto: UserUpdateDto): User {
-    if (userUpdateDto.name !== undefined) {
-      this.name = userUpdateDto.name.trim();
+  public update(userPatchDto: UserPatchDto): User {
+    if (userPatchDto.name !== undefined && userPatchDto.name !== null) {
+      this.name = userPatchDto.name.trim();
     }
 
-    if (userUpdateDto.email !== undefined) {
-      this.email = userUpdateDto.email.toLowerCase().trim();
+    if (userPatchDto.email !== undefined && userPatchDto.email !== null) {
+      this.email = userPatchDto.email.toLowerCase().trim();
     }
 
     return this;

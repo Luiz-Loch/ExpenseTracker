@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CategoryUpdateValidator } from "./category-update.validator";
 import { Category } from "../../entities/category.entity";
-import { CategoryUpdateDto } from "../../dto/update-category.dto";
+import { CategoryPatchDto } from "../../dto/patch-category.dto";
 
 export class NameUniqueOnUpdateValidator
   implements CategoryUpdateValidator {
@@ -13,12 +13,12 @@ export class NameUniqueOnUpdateValidator
     private readonly categoryRepository: Repository<Category>,
   ) { }
 
-  public async validate(userId: string, id: string, categoryUpdateDto: CategoryUpdateDto): Promise<void> {
-    if (!categoryUpdateDto.name) {
+  public async validate(userId: string, id: string, categoryPatchDto: CategoryPatchDto): Promise<void> {
+    if (!categoryPatchDto.name) {
       return;
     }
 
-    const name: string = categoryUpdateDto.name.trim();
+    const name: string = categoryPatchDto.name.trim();
 
     const existing: Category | null = await this.categoryRepository.findOne({
       where: {

@@ -3,32 +3,36 @@ import { Currency } from "../enums/currency.enum";
 import { Type } from "class-transformer";
 import { ExpenseType } from "../enums/expense-type.enum";
 
-export class ExpenseCreateDto {
+export class ExpensePatchDto {
   @IsString()
   @Length(2, 100)
-  public readonly name: string;
+  @IsOptional()
+  public readonly name?: string;
 
   @IsUUID()
   @IsOptional()
-  public readonly categoryId?: string;
+  public readonly categoryId?: string | null;
 
   @IsString()
   @MaxLength(255)
   @IsOptional()
-  public readonly description?: string;
+  public readonly description?: string | null;
 
   @Min(0.01)
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 2 })
-  public readonly amount: number;
+  @IsOptional()
+  public readonly amount?: number;
 
   @IsEnum(Currency)
   @IsOptional()
   public readonly currency?: Currency;
 
   @IsEnum(ExpenseType)
+  @IsOptional()
   public readonly type?: ExpenseType;
 
   @Type(() => Date)
   @IsDate()
-  public readonly spentAt: Date;
+  @IsOptional()
+  public readonly spentAt?: Date;
 }

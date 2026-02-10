@@ -6,7 +6,7 @@ import { USER_CREATE_VALIDATORS, USER_UPDATE_VALIDATORS } from './validations/to
 import { UserCreateValidator } from './validations/create/user-create.validator';
 import { UserUpdateValidator } from './validations/update/user-update.validator';
 import { UserUpdatePasswordDto } from './dto/update-password-user.dt';
-import { UserUpdateDto } from './dto/update-user.dto';
+import { UserPatchDto } from './dto/patch-user.dto';
 import { UserCreate } from './types/create-user.type';
 
 
@@ -50,14 +50,14 @@ export class UserService {
     return user;
   }
 
-  public async update(id: string, userUpdateDto: UserUpdateDto): Promise<User> {
+  public async update(id: string, userPatchDto: UserPatchDto): Promise<User> {
     const user: User = await this.findOne(id);
 
     for (const validator of this.updateValidators) {
-      await validator.validate(id, userUpdateDto);
+      await validator.validate(id, userPatchDto);
     }
 
-    user.update(userUpdateDto);
+    user.update(userPatchDto);
 
     return this.userRepository.save(user);
   }

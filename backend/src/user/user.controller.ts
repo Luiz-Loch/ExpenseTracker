@@ -1,6 +1,6 @@
 import { Controller, Get, Body, Patch, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserUpdateDto } from './dto/update-user.dto';
+import { UserPatchDto } from './dto/patch-user.dto';
 import { UserResponseDto } from './dto/response-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
@@ -20,8 +20,8 @@ export class UserController {
   }
 
   @Patch('me')
-  public async updateMe(@CurrentUserId() id: string, @Body() userUpdateDto: UserUpdateDto): Promise<UserResponseDto> {
-    const user = await this.userService.update(id, userUpdateDto);
+  public async updateMe(@CurrentUserId() id: string, @Body() userPatchDto: UserPatchDto): Promise<UserResponseDto> {
+    const user = await this.userService.update(id, userPatchDto);
     return new UserResponseDto(user);
   }
 

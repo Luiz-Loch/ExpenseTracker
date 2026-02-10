@@ -1,6 +1,6 @@
 import { IsEmail, IsOptional, IsString, Length } from "class-validator";
 
-export class UserUpdateDto {
+export class UserPatchDto {
 
   @IsString()
   @Length(2, 100)

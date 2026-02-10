@@ -1,7 +1,7 @@
-import { UserUpdateDto } from '../../dto/update-user.dto';
+import { UserPatchDto } from '../../dto/patch-user.dto';
 
 export interface UserUpdateValidator {
 
-  validate(id: string, userUpdateDto: UserUpdateDto): Promise<void> | void;
+  validate(id: string, userPatchDto: UserPatchDto): Promise<void> | void;
 
 }

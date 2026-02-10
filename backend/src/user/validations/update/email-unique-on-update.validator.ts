@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { UserUpdateDto } from '../../dto/update-user.dto';
+import { UserPatchDto } from '../../dto/patch-user.dto';
 import { UserUpdateValidator } from './user-update.validator';
 
 @Injectable()
@@ -14,12 +14,12 @@ export class EmailUniqueOnUpdateValidator
     private readonly userRepository: Repository<User>,
   ) { }
 
-  public async validate(id: string, userUpdateDto: UserUpdateDto): Promise<void> {
-    if (!userUpdateDto.email) {
+  public async validate(id: string, userPatchDto: UserPatchDto): Promise<void> {
+    if (!userPatchDto.email) {
       return;
     }
 
-    const email = userUpdateDto.email.toLowerCase().trim();
+    const email = userPatchDto.email.toLowerCase().trim();
 
     const existing = await this.userRepository.findOne({ where: { email } });
 

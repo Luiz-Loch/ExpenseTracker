@@ -1,34 +1,59 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
-import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ExpenseCreateDto } from './dto/create-expense.dto';
+import { ExpenseResponseDto } from './dto/response-expense.dto';
+import { Expense } from './entities/expense.entity';
+import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
+import { ExpensePatchDto } from './dto/patch-expense.dto';
 
-@Controller('expense')
+@Controller('expenses')
+@UseGuards(JwtAuthGuard)
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  public constructor(
+    private readonly expenseService: ExpenseService,
+  ) { }
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expenseService.create(createExpenseDto);
+  public async create(
+    @CurrentUserId() userId: string,
+    @Body() expenseCreateDto: ExpenseCreateDto,
+  ): Promise<ExpenseResponseDto> {
+    const expense: Expense = await this.expenseService.create(userId, expenseCreateDto);
+    return new ExpenseResponseDto(expense);
   }
 
   @Get()
-  findAll() {
-    return this.expenseService.findAll();
+  public async findAll(@CurrentUserId() userId: string,
+  ): Promise<Array<ExpenseResponseDto>> {
+    const expenses: Array<Expense> = await this.expenseService.findAll(userId);
+    return expenses.map(expense => new ExpenseResponseDto(expense));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.expenseService.findOne(+id);
+  public async findOne(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+  ): Promise<ExpenseResponseDto> {
+    const expense: Expense = await this.expenseService.findOne(userId, id);
+    return new ExpenseResponseDto(expense);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expenseService.update(+id, updateExpenseDto);
+  public async update(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+    @Body() expensePatchDto: ExpensePatchDto,
+  ): Promise<ExpenseResponseDto> {
+    const expense: Expense = await this.expenseService.update(userId, id, expensePatchDto);
+    return new ExpenseResponseDto(expense);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.expenseService.remove(+id);
+  public async remove(
+    @CurrentUserId() userId: string,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return await this.expenseService.remove(userId, id);
   }
 }

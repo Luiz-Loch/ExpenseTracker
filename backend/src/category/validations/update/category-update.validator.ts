@@ -1,7 +1,7 @@
-import { CategoryUpdateDto } from '../../dto/update-category.dto';
+import { CategoryPatchDto } from '../../dto/patch-category.dto';
 
 export interface CategoryUpdateValidator {
 
-  validate(userId: string, id: string, categoryUpdateDto: CategoryUpdateDto): Promise<void> | void;
+  validate(userId: string, id: string, categoryPatchDto: CategoryPatchDto): Promise<void> | void;
 
 }

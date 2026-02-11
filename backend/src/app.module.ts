@@ -6,6 +6,7 @@ import { PostgresConfigService } from './configuration/postgres.config.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ExpenseModule } from './expense/expense.module';
     AuthModule,
     CategoryModule,
     ExpenseModule,
+    ReportModule,
   ],
   controllers: [],
   providers: [],

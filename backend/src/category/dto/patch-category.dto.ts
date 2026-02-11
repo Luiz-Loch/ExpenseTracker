@@ -1,9 +1,11 @@
-import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Length } from 'class-validator';
 
 export class CategoryPatchDto {
 
   @IsString()
   @Length(2, 100)
   @IsOptional()
+  @ApiPropertyOptional({ description: 'Name to update the category to' })
   public readonly name?: string;
 }

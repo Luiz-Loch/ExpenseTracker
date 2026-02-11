@@ -6,15 +6,19 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { CategoryResponseDto } from './dto/response-category.dto';
 import { Category } from './entities/category.entity';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('categories')
+@ApiTags('Categories')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('bearer')
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
   ) { }
 
   @Post()
+  @ApiOkResponse({ type: CategoryResponseDto })
   public async create(
     @CurrentUserId() userId: string,
     @Body() categoryCreateDto: CategoryCreateDto,
@@ -24,12 +28,14 @@ export class CategoryController {
   }
 
   @Get()
+  @ApiOkResponse({ type: Array<CategoryResponseDto> })
   public async findAll(@CurrentUserId() userId: string): Promise<Array<CategoryResponseDto>> {
     const categories: Array<Category> = await this.categoryService.findAll(userId);
     return categories.map(category => new CategoryResponseDto(category));
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: CategoryResponseDto })
   public async findOne(
     @CurrentUserId() userId: string,
     @Param('id') id: string,
@@ -39,6 +45,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
+  @ApiOkResponse({ type: CategoryResponseDto })
   public async update(
     @CurrentUserId() userId: string,
     @Param('id') id: string,

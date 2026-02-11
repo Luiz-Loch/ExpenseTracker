@@ -6,15 +6,19 @@ import { ExpenseResponseDto } from './dto/response-expense.dto';
 import { Expense } from './entities/expense.entity';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { ExpensePatchDto } from './dto/patch-expense.dto';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('expenses')
+@ApiTags('Expenses')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('bearer')
 export class ExpenseController {
   public constructor(
     private readonly expenseService: ExpenseService,
   ) { }
 
   @Post()
+  @ApiOkResponse({ type: ExpenseResponseDto })
   public async create(
     @CurrentUserId() userId: string,
     @Body() expenseCreateDto: ExpenseCreateDto,
@@ -24,6 +28,7 @@ export class ExpenseController {
   }
 
   @Get()
+  @ApiOkResponse({ type: Array<ExpenseResponseDto> })
   public async findAll(@CurrentUserId() userId: string,
   ): Promise<Array<ExpenseResponseDto>> {
     const expenses: Array<Expense> = await this.expenseService.findAll(userId);
@@ -31,6 +36,7 @@ export class ExpenseController {
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: ExpenseResponseDto })
   public async findOne(
     @CurrentUserId() userId: string,
     @Param('id') id: string,
@@ -40,6 +46,7 @@ export class ExpenseController {
   }
 
   @Patch(':id')
+  @ApiOkResponse({ type: ExpenseResponseDto })
   public async update(
     @CurrentUserId() userId: string,
     @Param('id') id: string,

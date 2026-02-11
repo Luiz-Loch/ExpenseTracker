@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Category } from '../category/entities/category.entity';
 import { Expense } from '../expense/entities/expense.entity';
-import { SummaryReport } from './types/report.types';
+import { SummaryReport } from './types/summary.types';
 import { MonthlyReport } from './types/monthly.type';
 import { CategoryResponseDto } from 'src/category/dto/response-category.dto';
 import { ExpenseType } from '../expense/enums/expense-type.enum';
@@ -107,7 +107,7 @@ export class ReportService {
 
     const byCategory: SummaryReport['byCategory'] = byCategoryRows.map((r) => {
       const totals: Totals = this.totalsFromRow(r, currency);
-      
+
       return {
         category: r.categoryId ? categoryMap.get(r.categoryId) ?? null : null,
         totals
@@ -115,7 +115,7 @@ export class ReportService {
     });
 
     return {
-      range: { from: query.from, to: query.to },
+      range: { from, to },
       currency,
       totals,
       byCategory,
@@ -226,7 +226,7 @@ export class ReportService {
     });
 
     return {
-      range: { from: query.from, to: query.to },
+      range: { from, to },
       currency,
       items,
     };

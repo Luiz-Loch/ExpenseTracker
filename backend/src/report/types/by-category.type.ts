@@ -4,8 +4,8 @@ import { Totals } from "./totals.type";
 
 export type ByCategoryReport = {
   range: {
-    from: string;
-    to: string;
+    from: Date;
+    to: Date;
   };
   currency: Currency;
   items: Array<CategoryItem>;

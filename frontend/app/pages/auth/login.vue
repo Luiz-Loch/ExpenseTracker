@@ -45,9 +45,7 @@ const rules = {
   required: (v: string) => (!!v && v.length > 0) || 'Campo obrigatório',
   email: (v: string) => /.+@.+\..+/.test(v) || 'Email inválido',
   strongPassword: (v: string) => {
-    const regex: RegExp =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
-
+    const regex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
     return (
       regex.test(v) ||
       'Senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e símbolo'

@@ -1,10 +1,14 @@
-import { defineStore } from 'pinia'
+import { defineStore, StoreDefinition } from 'pinia'
 import type { LoginPayload, AuthResponse } from '../types/auth'
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore: StoreDefinition = defineStore('auth', {
   state: () => ({
     token: null as string | null,
   }),
+
+  getters: {
+    isAuthenticated: (s) => !!s.token,
+  },
 
   actions: {
     async login(payload: LoginPayload): Promise<void> {

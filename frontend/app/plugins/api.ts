@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 import type { RuntimeConfig } from 'nuxt/schema';
-import { useAuthStore } from '../../stores/auth'
+import { useAuthStore } from '../stores/auth'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config: RuntimeConfig = useRuntimeConfig()

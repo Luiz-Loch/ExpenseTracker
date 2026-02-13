@@ -9,11 +9,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
 
-  css: [
-    'vuetify/styles',
-    '@mdi/font/css/materialdesignicons.css',
-  ],
-
   build: {
     transpile: ['vuetify'],
   },

@@ -1,0 +1,40 @@
+/* ─── Navigation Drawer ─────────────────────────────── */
+.app-drawer {
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: rgb(var(--v-theme-surface)) !important;
+}
+
+.active-nav-item {
+  background-color: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+.active-nav-item .v-list-item__prepend .v-icon {
+  color: rgb(var(--v-theme-on-primary)) !important;
+}
+
+/* ─── Main Content ──────────────────────────────────── */
+.main-content {
+  background-color: rgb(var(--v-theme-background));
+  min-height: 100vh;
+}
+
+/* ─── Auth Layout ───────────────────────────────────── */
+.auth-background {
+  background-color: rgb(var(--v-theme-background));
+  min-height: 100vh;
+}
+
+/* ─── Cards ─────────────────────────────────────────── */
+.summary-card {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  transition: box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.chart-card {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}

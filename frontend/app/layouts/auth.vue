@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="d-flex align-center justify-center pa-6">
+    <v-main class="d-flex align-center justify-center pa-6 auth-background">
       <div style="width: 100%; max-width: 420px;">
         <slot />
       </div>

@@ -8,6 +8,16 @@ export enum ExpenseType {
   INCOME = 'INCOME',
 }
 
+export enum Period {
+  ALL = 'all',
+  LAST_7_DAYS = '7d',
+  LAST_30_DAYS = '30d',
+  THIS_MONTH = 'this-month',
+  LAST_MONTH = 'last-month',
+  LAST_3_MONTHS = '3m',
+  THIS_YEAR = 'this-year',
+}
+
 // ─── Response DTOs ───────────────────────────────────
 export type ExpenseResponse = {
   id: string
@@ -26,6 +36,7 @@ export type ExpenseResponse = {
 export type CategoryResponse = {
   id: string
   name: string
+  color: string
   createdAt: Date
   updatedAt: Date
 }

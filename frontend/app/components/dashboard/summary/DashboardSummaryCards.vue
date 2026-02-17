@@ -1,5 +1,5 @@
 <template>
-  <v-row class="mb-2">
+  <v-row class="mb-6">
     <!-- Total expense -->
     <v-col cols="12" md="4">
       <DashboardTotalExpenseCard

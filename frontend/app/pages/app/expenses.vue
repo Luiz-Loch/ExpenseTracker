@@ -157,7 +157,9 @@ const filteredExpenses = computed(() => {
   }
 
   // Category
-  if (categoryFilter.value !== 'all') {
+  if (categoryFilter.value === 'none') {
+    result = result.filter(e => !e.category);
+  } else if (categoryFilter.value !== 'all') {
     result = result.filter(e => e.category?.id === categoryFilter.value);
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined" rounded="lg" class="pa-5 mb-6 summary-card">
+  <v-card variant="outlined" rounded="lg" class="pa-5 mb-6 app-card">
     <v-row>
       <v-col cols="12" md="6">
         <div class="text-body-2 font-weight-medium mb-2">Buscar</div>
@@ -44,7 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { Period, type CategoryResponse } from '~/types/expense'
+import { Period } from '~/types/expense'
+import type { CategoryResponse } from '~/types/category'
 
 const props = defineProps<{
   categories: Array<CategoryResponse>,
@@ -65,7 +66,10 @@ const PERIOD_OPTIONS: ReadonlyArray<{ label: string; value: Period }> = [
 ];
 
 const categoryItems = computed(() => {
-  const items: Array<{ label: string; value: string }> = [{ label: 'Todas', value: 'all' }];
+  const items: Array<{ label: string; value: string }> = [
+    { label: 'Todas', value: 'all' },
+    { label: 'Sem categoria', value: 'none' },
+  ];
   for (const cat of props.categories) {
     items.push({ label: cat.name, value: cat.id });
   }

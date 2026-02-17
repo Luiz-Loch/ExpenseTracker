@@ -1,5 +1,5 @@
 <template>
-  <DashboardChartCard title="Gastos por Categoria" :has-data="hasData" class="summary-card">
+  <DashboardChartCard title="Gastos por Categoria" :has-data="hasData" class="app-card">
     <Bar :data="chartData" :options="chartOptions" />
   </DashboardChartCard>
 </template>

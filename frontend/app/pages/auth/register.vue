@@ -83,20 +83,7 @@ const loading = ref<boolean>(false)
 const error = ref<string | null>(null)
 const isValid = ref<boolean>(false)
 
-const rules = {
-  required: (v: string) => (!!v && v.length > 0) || 'Campo obrigatório',
-  min: (n: number) => (v: string) => (v?.length >= n) || `Mínimo de ${n} caracteres`,
-  max: (n: number) => (v: string) => (v?.length <= n) || `Máximo de ${n} caracteres`,
-  email: (v: string) => /.+@.+\..+/.test(v) || 'Email inválido',
-  strongPassword: (v: string) => {
-    const regex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
-    return (
-      regex.test(v) ||
-      'Senha deve ter no mínimo 8 caracteres, incluindo maiúscula, minúscula, número e símbolo'
-    )
-  },
-  samePassword: (v: string) => v === password.value || 'As senhas não conferem',
-}
+const { rules } = useFormRules({ password });
 
 async function onSubmit(): Promise<void> {
   error.value = null

@@ -1,22 +1,8 @@
 <template>
   <div>
-    <!-- Header -->
-    <div class="d-flex justify-space-between align-center mb-6">
-      <div>
-        <h1 class="text-h4 font-weight-bold">Dashboard</h1>
-        <p class="text-body-2 text-medium-emphasis mt-1">
-          Visão geral dos seus gastos mensais
-        </p>
-      </div>
-      <v-btn color="primary" prepend-icon="mdi-plus" size="large" to="/app/expenses">
-        Adicionar gasto
-      </v-btn>
-    </div>
+    <DashboardHeader />
 
-    <!-- Loading -->
-    <div v-if="loading" class="d-flex justify-center align-center" style="min-height: 400px">
-      <v-progress-circular indeterminate color="primary" size="48" />
-    </div>
+    <AppLoading v-if="loading" />
 
     <!-- Summary itens: total expenses, balance and highest category -->
     <template v-else>
@@ -36,9 +22,11 @@ import { ref, onMounted } from 'vue'
 import type { MonthlyDataPoint } from '~/components/dashboard/chart/cards/DashboardMonthlyChart.vue';
 import type { ExpenseResponse } from '~/types/expense'
 import type { MonthlyReportResponse, SummaryReportResponse } from '~/types/report'
-import DashboardSummaryCards from '~/components/dashboard/DashboardSummaryCards.vue'
-import DashboardCharts from '~/components/dashboard/DashboardCharts.vue'
-import DashboardRecentExpenses from '~/components/dashboard/DashboardRecentExpenses.vue'
+import DashboardHeader from '~/components/dashboard/header/DashboardHeader.vue'
+import DashboardSummaryCards from '~/components/dashboard/summary/DashboardSummaryCards.vue'
+import DashboardCharts from '~/components/dashboard/chart/DashboardCharts.vue'
+import DashboardRecentExpenses from '~/components/dashboard/recent/DashboardRecentExpenses.vue'
+import AppLoading from '~/components/common/AppLoading.vue'
 
 definePageMeta({ layout: 'app' });
 

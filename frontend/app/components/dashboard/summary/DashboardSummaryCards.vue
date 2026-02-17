@@ -27,9 +27,9 @@
 
 <script setup lang="ts">
 import type { SummaryReportResponse } from '~/types/report'
-import DashboardTotalExpenseCard from './summary/cards/DashboardTotalExpenseCard.vue'
-import DashboardBalanceCard from './summary/cards/DashboardBalanceCard.vue'
-import DashboardTopCategoryCard from './summary/cards/DashboardTopCategoryCard.vue'
+import DashboardTotalExpenseCard from './cards/DashboardTotalExpenseCard.vue'
+import DashboardBalanceCard from './cards/DashboardBalanceCard.vue'
+import DashboardTopCategoryCard from './cards/DashboardTopCategoryCard.vue'
 import { Currency } from '~/types/expense';
 
 

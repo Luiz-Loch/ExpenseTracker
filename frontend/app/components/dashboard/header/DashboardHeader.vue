@@ -14,7 +14,7 @@
       to="/app/expenses"
       aria-label="Adicionar gasto"
     >
-      Adicionar gasto
+      Nova transação
     </v-btn>
   </header>
 </template>

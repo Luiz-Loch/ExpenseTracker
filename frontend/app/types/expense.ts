@@ -1,3 +1,5 @@
+import type { CategoryResponse } from './category'
+
 // ─── Enums ───────────────────────────────────────────
 export enum Currency {
   BRL = 'BRL',
@@ -33,10 +35,23 @@ export type ExpenseResponse = {
   updatedAt: Date
 }
 
-export type CategoryResponse = {
-  id: string
+// ─── Request DTOs ────────────────────────────────────
+export type CreateExpenseRequest = {
   name: string
-  color: string
-  createdAt: Date
-  updatedAt: Date
+  type: ExpenseType
+  amount: number
+  spentAt: string
+  categoryId?: string
+  description?: string
+  currency?: Currency
+}
+
+export type PatchExpenseRequest = {
+  name?: string
+  type?: ExpenseType
+  amount?: number
+  spentAt?: string
+  categoryId?: string | null
+  description?: string | null
+  currency?: Currency
 }

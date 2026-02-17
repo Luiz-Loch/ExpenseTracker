@@ -39,6 +39,7 @@ export class CategoryService {
     const category: Category = this.categoryRepository.create({
       user: user,
       name: categoryCreateDto.name.trim(),
+      color: categoryCreateDto.color,
     });
 
     return this.categoryRepository.save(category);

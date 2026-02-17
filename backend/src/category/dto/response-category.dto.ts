@@ -8,6 +8,9 @@ export class CategoryResponseDto {
     @ApiProperty({ description: 'The name of the category' })
     public readonly name: string;
 
+    @ApiProperty({ description: 'Hex color for the category', example: '#ff5733' })
+    public readonly color: string;
+
     @ApiProperty({ description: 'The date and time when the category was created' })
     public readonly createdAt: Date;
 
@@ -17,6 +20,7 @@ export class CategoryResponseDto {
     public constructor(category: Category) {
         this.id = category.id;
         this.name = category.name;
+        this.color = category.color;
         this.createdAt = category.createdAt;
         this.updatedAt = category.updatedAt;
     }

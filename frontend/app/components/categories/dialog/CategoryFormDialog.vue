@@ -61,7 +61,7 @@
           variant="tonal"
           size="small"
           prepend-icon="mdi-palette"
-          @click="form.color = '#4CAF50'"
+          @click="form.color = randomColor()"
         >
           Adicionar cor
         </v-btn>
@@ -123,10 +123,19 @@ type FormData = {
 
 const form = ref<FormData>(emptyForm());
 
+function randomColor(): string {
+  const colors = [
+    '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336',
+    '#00BCD4', '#E91E63', '#3F51B5', '#009688', '#FF5722',
+    '#607D8B', '#795548', '#CDDC39', '#FFC107', '#673AB7',
+  ];
+  return colors[Math.floor(Math.random() * colors.length)]!;
+}
+
 function emptyForm(): FormData {
   return {
     name: '',
-    color: '#4CAF50',
+    color: randomColor(),
   }
 }
 

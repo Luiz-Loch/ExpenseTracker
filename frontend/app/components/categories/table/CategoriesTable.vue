@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined" rounded="lg" class="summary-card">
+  <v-card variant="outlined" rounded="lg" class="app-card">
     <v-table>
       <thead>
         <tr>

@@ -25,13 +25,32 @@
   min-height: 100vh;
 }
 
+.auth-background .h-100 {
+  min-height: 100vh;
+}
+
+.auth-branding {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-branding::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+}
+
 /* ─── Cards ─────────────────────────────────────────── */
-.summary-card {
+.app-card {
   border-color: rgba(0, 0, 0, 0.1) !important;
   transition: box-shadow 0.2s;
 }
 
-.summary-card:hover {
+.app-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
 }
 

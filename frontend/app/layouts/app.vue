@@ -49,7 +49,6 @@ const navItems = [
   { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/app' },
   { title: 'Gastos', icon: 'mdi-cash-register', to: '/app/expenses' },
   { title: 'Categorias', icon: 'mdi-shape-outline', to: '/app/categories' },
-  { title: 'Relatórios', icon: 'mdi-chart-bar', to: '/app/reports' },
   { title: 'Perfil', icon: 'mdi-account-outline', to: '/app/profile' },
 ]
 

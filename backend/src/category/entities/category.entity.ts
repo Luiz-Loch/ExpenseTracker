@@ -21,6 +21,9 @@ export class Category {
   @Column({ name: 'name', nullable: false, length: 100 })
   name: string;
 
+  @Column({ name: 'color', nullable: true, length: 7 })
+  color: string;
+
   @CreateDateColumn({ name: 'created_at', nullable: false, type: 'timestamptz' })
   createdAt: Date;
 
@@ -33,6 +36,9 @@ export class Category {
   public update(categoryPatchDto: CategoryPatchDto): Category {
     if (categoryPatchDto.name !== undefined && categoryPatchDto.name !== null) {
       this.name = categoryPatchDto.name.trim();
+    }
+    if (categoryPatchDto.color !== undefined) {
+      this.color = categoryPatchDto.color;
     }
 
     return this;

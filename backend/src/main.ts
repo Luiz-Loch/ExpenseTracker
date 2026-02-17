@@ -14,6 +14,11 @@ async function bootstrap() {
     })
   );
 
+  app.enableCors({
+    origin: ['http://' + process.env.FRONTEND_HOST + ':' + process.env.FRONTEND_PORT],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  });
+
   const config = new DocumentBuilder()
     .setTitle('ExpenseTracker API')
     .setDescription('API de finanças pessoais')

@@ -52,7 +52,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { ExpenseType, Period, type ExpenseResponse, type CategoryResponse } from '~/types/expense'
+import { ExpenseType, Period, type ExpenseResponse } from '~/types/expense'
+import type { CategoryResponse } from '~/types/category'
 import ExpensesHeader from '~/components/expenses/header/ExpensesHeader.vue'
 import ExpensesFilters from '~/components/expenses/filter/ExpensesFilters.vue'
 import ExpensesSummaryCards from '~/components/expenses/summary/ExpensesSummaryCards.vue'
@@ -61,47 +62,26 @@ import ExpenseFormDialog from '~/components/expenses/dialog/ExpenseFormDialog.vu
 import ExpenseDeleteDialog from '~/components/expenses/dialog/ExpenseDeleteDialog.vue'
 import AppLoading from '~/components/common/AppLoading.vue'
 
-definePageMeta({ layout: 'app' })
+definePageMeta({ layout: 'app' });
 
 const api = useApi();
-
-enum SnackbarColor {
-  SUCCESS = 'success',
-  ERROR = 'error',
-  INFO = 'info',
-  WARNING = 'warning',
-}
+const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
 // ─── State ───────────────────────────────────────────
-const loading = ref(true);
+const loading = ref<boolean>(true);
 const allExpenses = ref<Array<ExpenseResponse>>([]);
 const categories = ref<Array<CategoryResponse>>([]);
 
 // Filters
-const search = ref('');
+const search = ref<string>('');
 const period = ref<Period>(Period.ALL)
 const categoryFilter = ref<'all' | string>('all')
 
-// Pagination
-const currentPage = ref(1);
-const itemsPerPage = 10;
-
 // Dialogs
-const formDialog = ref(false);
-const deleteDialog = ref(false);
+const formDialog = ref<boolean>(false);
+const deleteDialog = ref<boolean>(false);
 const editingExpense = ref<ExpenseResponse | null>(null);
 const deletingExpense = ref<ExpenseResponse | null>(null);
-
-// Snackbar
-const snackbar = ref<{ open: boolean; text: string; color: SnackbarColor }>({
-  open: false,
-  text: '',
-  color: SnackbarColor.SUCCESS,
-});
-
-function showSnackbar(text: string, color: SnackbarColor = SnackbarColor.SUCCESS) {
-  snackbar.value = { open: true, text, color }
-}
 
 // ─── Period Range Helper ─────────────────────────────
 function getPeriodRange(period: Period): { from: Date | null; to: Date } {
@@ -149,7 +129,7 @@ function getPeriodRange(period: Period): { from: Date | null; to: Date } {
   }
 }
 
-// ─── Derived: sorted + filtered + totals + pagination ─
+// ─── Derived: sorted + filtered + totals ─────────────
 const sortedExpenses = computed(() => {
   return [...allExpenses.value].sort((a, b) => +new Date(b.spentAt) - +new Date(a.spentAt))
 });
@@ -196,17 +176,13 @@ const totals = computed(() => {
   return { income, expense, balance: income - expense };
 });
 
-const paginatedExpenses = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  return filteredExpenses.value.slice(start, start + itemsPerPage)
-});
+// Pagination
+const { currentPage, itemsPerPage, paginatedItems: paginatedExpenses, resetPage } = usePagination(filteredExpenses);
 
 // Reset page on filter change
 watch(
   () => [search.value.trim(), period.value, categoryFilter.value],
-  () => {
-    currentPage.value = 1
-  },
+  () => { resetPage() },
   { flush: 'sync' },
 );
 
@@ -226,11 +202,6 @@ async function fetchData(): Promise<void> {
   } finally {
     loading.value = false;
   }
-}
-
-async function refreshWithMessage(message: string) {
-  showSnackbar(message)
-  await fetchData()
 }
 
 // ─── Dialog Actions ──────────────────────────────────

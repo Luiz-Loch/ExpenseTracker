@@ -7,7 +7,7 @@
         v-if="expense.category"
         size="small"
         variant="tonal"
-        :color="expense.category.color"
+        :color="expense.category.color ?? '#9E9E9E'"
       >
         {{ expense.category.name }}
       </v-chip>

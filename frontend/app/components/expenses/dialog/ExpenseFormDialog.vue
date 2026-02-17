@@ -7,11 +7,11 @@
   >
     <v-form ref="formRef" v-model="isValid" @submit.prevent="save">
       <!-- Type toggle -->
-      <div class="mb-4">
-        <div class="text-body-2 font-weight-medium mb-2">Tipo</div>
-        <v-btn-toggle v-model="form.type" mandatory color="primary" variant="outlined" divided>
-          <v-btn :value="ExpenseType.EXPENSE">Despesa</v-btn>
-          <v-btn :value="ExpenseType.INCOME">Receita</v-btn>
+      <div class="mb-4 d-flex flex-column align-center">
+        <div class="text-body-2 font-weight-medium mb-2 align-self-start">Tipo</div>
+        <v-btn-toggle v-model="form.type" mandatory :color="form.type === ExpenseType.INCOME ? 'success' : 'error'" variant="outlined" class="ga-3">
+          <v-btn :value="ExpenseType.EXPENSE" prepend-icon="mdi-arrow-down" rounded="lg">Despesa</v-btn>
+          <v-btn :value="ExpenseType.INCOME" prepend-icon="mdi-arrow-up" rounded="lg">Receita</v-btn>
         </v-btn-toggle>
       </div>
 
@@ -95,7 +95,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { ExpenseType, type ExpenseResponse, type CategoryResponse } from '~/types/expense'
+import { ExpenseType, type ExpenseResponse, type CreateExpenseRequest, type PatchExpenseRequest } from '~/types/expense'
+import type { CategoryResponse } from '~/types/category'
 import AppDialog from '~/components/common/AppDialog.vue'
 
 const api = useApi();
@@ -171,12 +172,7 @@ const categoryItems = computed(() =>
 );
 
 // ─── Validation Rules ────────────────────────────────
-const rules = {
-  required: (v: any) => (v !== null && v !== undefined && v !== '') || 'Campo obrigatório',
-  min: (n: number) => (v: string) => (v?.length >= n) || `Mínimo de ${n} caracteres`,
-  max: (n: number) => (v: string) => (!v || v.length <= n) || `Máximo de ${n} caracteres`,
-  positiveNumber: (v: number) => (typeof v === 'number' && !isNaN(v) && v > 0) || 'Valor deve ser maior que zero',
-}
+const { rules } = useFormRules();
 
 // ─── Actions ─────────────────────────────────────────
 async function save() {
@@ -187,20 +183,20 @@ async function save() {
     const spentAt = new Date(form.value.spentAt + 'T12:00:00').toISOString();
 
     if (isEditing.value) {
-      const payload = {
+      const payload: PatchExpenseRequest = {
         name: form.value.name.trim(),
         type: form.value.type,
-        amount: form.value.amount,
+        amount: form.value.amount!,
         spentAt,
         categoryId: form.value.categoryId ?? null,
         description: form.value.description?.trim() || null,
       }
       await api.patch(`/expenses/${props.expense!.id}`, payload);
     } else {
-      const payload: Record<string, any> = {
+      const payload: CreateExpenseRequest = {
         name: form.value.name.trim(),
         type: form.value.type,
-        amount: form.value.amount,
+        amount: form.value.amount!,
         spentAt,
       }
       if (form.value.categoryId) payload.categoryId = form.value.categoryId;

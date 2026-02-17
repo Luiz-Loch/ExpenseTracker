@@ -1,16 +1,20 @@
 <template>
-  <v-card class="pa-4">
-    <v-card-title>Cadastro</v-card-title>
+  <v-card class="pa-5 app-card">
+    <v-card-title class="pa-0 pb-3">
+      <span class="text-h6 font-weight-bold">Cadastro</span>
+    </v-card-title>
 
-    <v-card-text>
+    <v-card-text class="pa-0">
       <v-form v-model="isValid" @submit.prevent="onSubmit">
         <!-- NOME -->
         <v-text-field
           v-model.trim="name"
           label="Nome"
           autocomplete="name"
+          variant="outlined"
+          density="comfortable"
           :rules="[rules.required, rules.min(2), rules.max(100)]"
-          class="mb-2"
+          class="mb-3"
         />
 
         <!-- EMAIL -->
@@ -19,28 +23,38 @@
           label="Email"
           type="email"
           autocomplete="email"
+          variant="outlined"
+          density="comfortable"
           :rules="[rules.required, rules.email, rules.max(100)]"
-          class="mb-2"
+          class="mb-3"
         />
 
         <!-- SENHA -->
         <v-text-field
           v-model="password"
           label="Senha"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
+          :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append-inner="showPassword = !showPassword"
           autocomplete="new-password"
+          variant="outlined"
+          density="comfortable"
           :rules="[rules.required, rules.strongPassword]"
-          class="mb-2"
+          class="mb-3"
         />
 
         <!-- CONFIRMAR SENHA -->
         <v-text-field
           v-model="confirmPassword"
           label="Confirmar senha"
-          type="password"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"
           autocomplete="new-password"
+          variant="outlined"
+          density="comfortable"
           :rules="[rules.required, rules.samePassword]"
-          class="mb-2"
+          class="mb-3"
         />
 
         <v-alert v-if="error" type="error" variant="tonal" class="mb-3">
@@ -48,6 +62,7 @@
         </v-alert>
 
         <v-btn
+          color="primary"
           type="submit"
           block
           :loading="loading"
@@ -67,10 +82,10 @@
 
 
 <script setup lang="ts">
-definePageMeta({ layout: 'auth' })
-
 import { ref } from 'vue'
-import { useAuthStore } from '../../stores/auth'
+import { useAuthStore } from '~/stores/auth'
+
+definePageMeta({ layout: 'auth' })
 
 const auth = useAuthStore()
 
@@ -82,6 +97,8 @@ const confirmPassword = ref<string>('')
 const loading = ref<boolean>(false)
 const error = ref<string | null>(null)
 const isValid = ref<boolean>(false)
+const showPassword = ref<boolean>(false)
+const showConfirmPassword = ref<boolean>(false)
 
 const { rules } = useFormRules({ password });
 

@@ -1,5 +1,5 @@
 <template>
-  <DashboardChartCard title="Evolução Mensal" :has-data="hasData">
+  <DashboardChartCard title="Evolução Mensal" :has-data="hasData" class="summary-card">
     <Line :data="chartData" :options="chartOptions" />
   </DashboardChartCard>
 </template>

@@ -11,8 +11,8 @@
 
 <script setup lang="ts">
 import type { SummaryReportResponse } from '~/types/report'
-import DashboardCategoryChart from './chart/cards/DashboardCategoryChart.vue';
-import DashboardMonthlyChart, { type MonthlyDataPoint } from './chart/cards/DashboardMonthlyChart.vue';
+import DashboardCategoryChart from './cards/DashboardCategoryChart.vue';
+import DashboardMonthlyChart, { type MonthlyDataPoint } from './cards/DashboardMonthlyChart.vue';
 
 defineProps<{
   summary: SummaryReportResponse | null,

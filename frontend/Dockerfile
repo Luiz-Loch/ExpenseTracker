@@ -19,12 +19,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
-
-RUN npm ci --omit=dev
-
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.output ./
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx typeorm migration:run -d dist/database/data-source.js && node dist/main.js"]
+CMD ["node", "server/index.mjs"]

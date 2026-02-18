@@ -52,9 +52,7 @@ export class Expense {
     }
     if (expensePatch.description !== undefined) {
       // if description is null, set it to undefined to allow clearing the description
-      console.log(this.description);
       this.description = expensePatch.description;
-      console.log(this.description);
     }
     if (expensePatch.amount !== undefined && expensePatch.amount !== null) {
       this.amountCents = CurrencyConfig.toMinorUnits(expensePatch.amount, this.currency);

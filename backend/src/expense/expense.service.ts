@@ -95,7 +95,6 @@ export class ExpenseService {
   }
 
   public async update(userId: string, id: string, expensePatchDto: ExpensePatchDto): Promise<Expense> {
-    console.log(expensePatchDto);
     const expense: Expense = await this.findOne(userId, id);
 
     for (const validator of this.updateValidators) {

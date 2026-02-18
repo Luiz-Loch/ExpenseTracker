@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:18.1
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${PG_USERNAME}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USERNAME} -d ${PG_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    container_name: backend_app
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "${COMPOSE_BACKEND_PORT}:3000"
+    networks:
+      - default
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    container_name: frontend_app
+    restart: always
+    ports:
+      - "${COMPOSE_FRONTEND_PORT}:3000"
+    networks:
+      - default
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  db-data:
+
+networks:
+  default:
+    driver: bridge

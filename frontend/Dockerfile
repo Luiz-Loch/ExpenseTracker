@@ -1,0 +1,26 @@
+# ---------- STAGE 1: build ----------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+
+# ---------- STAGE 2: production ----------
+FROM node:20-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/.output ./
+
+EXPOSE 3000
+
+CMD ["node", "server/index.mjs"]

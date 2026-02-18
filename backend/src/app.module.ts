@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ReportModule } from './report/report.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ReportModule } from './report/report.module';
     CategoryModule,
     ExpenseModule,
     ReportModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],

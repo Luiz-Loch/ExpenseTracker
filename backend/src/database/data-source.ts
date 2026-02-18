@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   username: configService.getOrThrow<string>('PG_USERNAME'),
   password: configService.getOrThrow<string>('PG_PASSWORD'),
   database: configService.getOrThrow<string>('PG_DATABASE'),
-  entities: ['src/**/*.entity.ts'],
-  migrations: ['src/database/migrations/*.ts'],
+  entities: [__dirname + '/../**/*.entity{.js,.ts}'],
+  migrations: [__dirname + '/migrations/*{.js,.ts}'],
   synchronize: false,
 });

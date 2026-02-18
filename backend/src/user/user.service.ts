@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -8,6 +8,8 @@ import { UserUpdateValidator } from './validations/update/user-update.validator'
 import { UserUpdatePasswordDto } from './dto/update-password-user.dt';
 import { UserPatchDto } from './dto/patch-user.dto';
 import { UserCreate } from './types/create-user.type';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
@@ -22,6 +24,8 @@ export class UserService {
 
     @Inject(USER_UPDATE_VALIDATORS)
     private readonly updateValidators: Array<UserUpdateValidator>,
+
+    private readonly configService: ConfigService,
   ) { }
 
   public async create(userCreateDto: UserCreate): Promise<User> {
@@ -71,6 +75,21 @@ export class UserService {
   public async updatePassword(id: string, userUpdatePasswordDto: UserUpdatePasswordDto): Promise<void> {
     const user: User = await this.findOne(id);
 
+    const isOldPasswordValid: boolean = await bcrypt.compare(
+      userUpdatePasswordDto.oldPassword,
+      user.passwordHash,
+    );
+
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const saltRounds: number = Number(this.configService.getOrThrow<number>('HASH_SALT_ROUNDS'));
+    const newPasswordHash: string = await bcrypt.hash(userUpdatePasswordDto.newPassword, saltRounds);
+
+    user.updatePassword(newPasswordHash);
+
+    await this.userRepository.save(user);
   }
 
 }

@@ -35,8 +35,7 @@ services:
 
       # Application configuration
       - PORT=${PORT}
-      - FRONTEND_HOST=${FRONTEND_HOST}
-      - FRONTEND_PORT=${COMPOSE_FRONTEND_PORT}
+      - FRONTEND_ENDPOINT=${FRONTEND_ENDPOINT}
 
       # Authentication configuration
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}

@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}`,
+      apiBaseUrl: '',
     }
   }
 })

@@ -3,8 +3,6 @@ services:
     image: postgres:18.1
     container_name: postgres_db
     restart: always
-    env_file:
-      - ./.env
     environment:
       POSTGRES_USER: ${PG_USERNAME}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
@@ -27,17 +25,31 @@ services:
       dockerfile: Dockerfile
     container_name: backend_app
     restart: always
-    env_file:
-      - ./.env
+    environment:
+      # Database configuration
+      - PG_USERNAME=${PG_USERNAME}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_DATABASE=${PG_DATABASE}
+      - PG_PORT=${PG_PORT}
+      - PG_HOST=${PG_HOST}
+
+      # Application configuration
+      - PORT=${PORT}
+      - FRONTEND_HOST=${FRONTEND_HOST}
+      - FRONTEND_PORT=${COMPOSE_FRONTEND_PORT}
+
+      # Authentication configuration
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - HASH_SALT_ROUNDS=${HASH_SALT_ROUNDS}
     ports:
-      - "${COMPOSE_BACKEND_PORT}:3000"
+      - "${COMPOSE_BACKEND_PORT}:${PORT}"
     networks:
       - default
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:${PORT}/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -49,6 +61,8 @@ services:
       dockerfile: Dockerfile
     container_name: frontend_app
     restart: always
+    environment:
+      - NUXT_PUBLIC_API_BASE_URL=http://${BACKEND_HOST}:${COMPOSE_BACKEND_PORT}
     ports:
       - "${COMPOSE_FRONTEND_PORT}:3000"
     networks:

@@ -49,6 +49,10 @@ apt-get install -y git
 APP_DIR="/home/ubuntu/ExpenseTracker"
 
 git clone https://github.com/Luiz-Loch/ExpenseTracker.git "$APP_DIR"
+
+cd "$APP_DIR"
+git checkout feature/infra
+
 chown -R ubuntu:ubuntu "$APP_DIR"
 
 # -------------------------------------------
@@ -81,8 +85,7 @@ PG_HOST=postgres
 
 ## APLICATION CONFIGURATION
 PORT=8080
-FRONTEND_HOST=${EC2_PUBLIC_IP}
-FRONTEND_PORT=3000
+FRONTEND_ENDPOINT=http://${EC2_PUBLIC_IP}
 
 ### AUTHENTICATION CONFIGURATION
 JWT_SECRET_KEY=your_jwt_secret_key
@@ -95,7 +98,7 @@ BACKEND_HOST=${EC2_PUBLIC_IP}
 
 # COMPOSE CONFIGURATION
 COMPOSE_BACKEND_PORT=8080
-COMPOSE_FRONTEND_PORT=3000
+COMPOSE_FRONTEND_PORT=80
 ENV
 
 chown ubuntu:ubuntu "$APP_DIR/.env"

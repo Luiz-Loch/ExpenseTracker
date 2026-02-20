@@ -14,8 +14,18 @@ async function bootstrap() {
     })
   );
 
+  const frontendOrigin: string | undefined = process.env.FRONTEND_ENDPOINT;
+
   app.enableCors({
-    origin: ['http://' + process.env.FRONTEND_HOST + ':' + process.env.FRONTEND_PORT],
+    origin: (origin, callback) => {
+      // undefined origin = Postman/curl/SSR -> allow
+      if (!origin) return callback(null, true);
+
+      if (origin === frontendOrigin) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   });
 

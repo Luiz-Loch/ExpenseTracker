@@ -50,9 +50,6 @@ APP_DIR="/home/ubuntu/ExpenseTracker"
 
 git clone https://github.com/Luiz-Loch/ExpenseTracker.git "$APP_DIR"
 
-cd "$APP_DIR"
-git checkout feature/infra
-
 chown -R ubuntu:ubuntu "$APP_DIR"
 
 # -------------------------------------------

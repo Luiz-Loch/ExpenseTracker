@@ -22,6 +22,7 @@ import { ref, onMounted } from 'vue'
 import type { MonthlyDataPoint } from '~/components/dashboard/chart/cards/DashboardMonthlyChart.vue';
 import type { ExpenseResponse } from '~/types/expense'
 import type { MonthlyReportResponse, SummaryReportResponse } from '~/types/report'
+import type { PaginatedResponse } from '~/types/pagination'
 import DashboardHeader from '~/components/dashboard/header/DashboardHeader.vue'
 import DashboardSummaryCards from '~/components/dashboard/summary/DashboardSummaryCards.vue'
 import DashboardCharts from '~/components/dashboard/chart/DashboardCharts.vue'
@@ -100,9 +101,9 @@ async function fetchSummary(range: { from: string; to: string }): Promise<Summar
   return res.data;
 }
 
-async function fetchAllExpenses(): Promise<Array<ExpenseResponse>> {
-  const res = await api.get<Array<ExpenseResponse>>('/expenses');
-  return res.data ?? [];
+async function fetchRecentExpenses(): Promise<Array<ExpenseResponse>> {
+  const res = await api.get<PaginatedResponse<ExpenseResponse>>('/expenses', { params: { page: 1, limit: 5 } });
+  return res.data.data ?? [];
 }
 
 async function fetchMonthlyReport(year: number): Promise<MonthlyReportResponse> {
@@ -131,7 +132,7 @@ onMounted(async () => {
     const [currentSummary, previousSummary, expenses, ...monthlyReports] = await Promise.all([
       fetchSummary(currentRange),
       fetchSummary(prevRange),
-      fetchAllExpenses(),
+      fetchRecentExpenses(),
       ...yearsToFetch.map(fetchMonthlyReport),
     ])
 
@@ -155,9 +156,7 @@ onMounted(async () => {
     last12Months.value = points
 
     // 7) Last 5 expenses
-    recentExpenses.value = [...expenses]
-      .sort((a, b) => new Date(b.spentAt).getTime() - new Date(a.spentAt).getTime())
-      .slice(0, 5)
+    recentExpenses.value = expenses
   } catch (e) {
     console.error('Erro ao carregar dados do dashboard:', e)
   } finally {

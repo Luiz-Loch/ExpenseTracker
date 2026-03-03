@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined" rounded="lg" class="pa-5 app-card">
+  <v-card variant="outlined" rounded="lg" class="pa-5 app-card h-100 d-flex flex-column">
     <div class="d-flex justify-space-between align-start">
       <div>
         <div class="text-body-2 text-medium-emphasis mb-2">{{ title }}</div>

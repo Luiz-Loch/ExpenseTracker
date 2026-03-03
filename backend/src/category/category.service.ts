@@ -8,6 +8,7 @@ import { CategoryCreateValidator } from './validations/create/category-create.va
 import { CategoryUpdateValidator } from './validations/update/category-update.validator';
 import { CategoryCreateDto } from './dto/create-category.dto';
 import { CategoryPatchDto } from './dto/patch-category.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 
 @Injectable()
@@ -45,8 +46,8 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
 
-  public async findAll(userId: string): Promise<Array<Category>> {
-    return this.categoryRepository.find({
+  public async findAll(userId: string, paginationQuery: PaginationQueryDto): Promise<[Array<Category>, number]> {
+    return this.categoryRepository.findAndCount({
       where: {
         user: { id: userId },
       },
@@ -54,6 +55,8 @@ export class CategoryService {
         user: true,
       },
       order: { name: 'ASC' },
+      skip: (paginationQuery.page - 1) * paginationQuery.limit,
+      take: paginationQuery.limit,
     });
   }
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryCreateDto } from './dto/create-category.dto';
 import { CategoryPatchDto } from './dto/patch-category.dto';
@@ -7,6 +7,8 @@ import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { CategoryResponseDto } from './dto/response-category.dto';
 import { Category } from './entities/category.entity';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -28,10 +30,14 @@ export class CategoryController {
   }
 
   @Get()
-  @ApiOkResponse({ type: Array<CategoryResponseDto> })
-  public async findAll(@CurrentUserId() userId: string): Promise<Array<CategoryResponseDto>> {
-    const categories: Array<Category> = await this.categoryService.findAll(userId);
-    return categories.map(category => new CategoryResponseDto(category));
+  @ApiOkResponse({ type: PaginatedResponseDto<CategoryResponseDto> })
+  public async findAll(
+    @CurrentUserId() userId: string,
+    @Query() paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<CategoryResponseDto>> {
+    const [categories, total]: [Array<Category>, number] = await this.categoryService.findAll(userId, paginationQuery);
+    const data: Array<CategoryResponseDto> = categories.map(category => new CategoryResponseDto(category));
+    return new PaginatedResponseDto(data, total, paginationQuery.page, paginationQuery.limit);
   }
 
   @Get(':id')

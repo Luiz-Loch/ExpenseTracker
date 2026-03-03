@@ -20,8 +20,8 @@
 
     <ExpensesTable
       v-else
-      :expenses="paginatedExpenses"
-      :total-items="filteredExpenses.length"
+      :expenses="filteredExpenses"
+      :total-items="total"
       v-model:current-page="currentPage"
       :items-per-page="itemsPerPage"
       @edit="openEdit"
@@ -54,6 +54,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { ExpenseType, Period, type ExpenseResponse } from '~/types/expense'
 import type { CategoryResponse } from '~/types/category'
+import type { PaginatedResponse } from '~/types/pagination'
 import ExpensesHeader from '~/components/expenses/header/ExpensesHeader.vue'
 import ExpensesFilters from '~/components/expenses/filter/ExpensesFilters.vue'
 import ExpensesSummaryCards from '~/components/expenses/summary/ExpensesSummaryCards.vue'
@@ -68,8 +69,6 @@ const api = useApi();
 const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
 // ─── State ───────────────────────────────────────────
-const loading = ref<boolean>(true);
-const allExpenses = ref<Array<ExpenseResponse>>([]);
 const categories = ref<Array<CategoryResponse>>([]);
 
 // Filters
@@ -82,6 +81,14 @@ const formDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const editingExpense = ref<ExpenseResponse | null>(null);
 const deletingExpense = ref<ExpenseResponse | null>(null);
+
+// ─── Server-Side Pagination ──────────────────────────
+const { items: expenses, currentPage, itemsPerPage, total, loading, fetchPage } = usePagination<ExpenseResponse>(
+  async (page: number, limit: number) => {
+    const res = await api.get<PaginatedResponse<ExpenseResponse>>('/expenses', { params: { page, limit } });
+    return res.data;
+  },
+);
 
 // ─── Period Range Helper ─────────────────────────────
 function getPeriodRange(period: Period): { from: Date | null; to: Date } {
@@ -129,13 +136,9 @@ function getPeriodRange(period: Period): { from: Date | null; to: Date } {
   }
 }
 
-// ─── Derived: sorted + filtered + totals ─────────────
-const sortedExpenses = computed(() => {
-  return [...allExpenses.value].sort((a, b) => +new Date(b.spentAt) - +new Date(a.spentAt))
-});
-
+// ─── Local Filters (applied to current page data) ────
 const filteredExpenses = computed(() => {
-  let result: Array<ExpenseResponse> = sortedExpenses.value
+  let result: Array<ExpenseResponse> = expenses.value
 
   // Search
   const query: string = search.value.trim().toLowerCase();
@@ -178,31 +181,24 @@ const totals = computed(() => {
   return { income, expense, balance: income - expense };
 });
 
-// Pagination
-const { currentPage, itemsPerPage, paginatedItems: paginatedExpenses, resetPage } = usePagination(filteredExpenses);
-
-// Reset page on filter change
+// Reset to page 1 on filter change
 watch(
   () => [search.value.trim(), period.value, categoryFilter.value],
-  () => { resetPage() },
+  () => {
+    if (currentPage.value !== 1) {
+      currentPage.value = 1;
+    }
+  },
   { flush: 'sync' },
 );
 
 // ─── API ─────────────────────────────────────────────
-async function fetchData(): Promise<void> {
-  loading.value = true
+async function fetchCategories(): Promise<void> {
   try {
-    const [expensesRes, categoriesRes] = await Promise.all([
-      api.get<Array<ExpenseResponse>>('/expenses'),
-      api.get<Array<CategoryResponse>>('/categories'),
-    ]);
-    allExpenses.value = expensesRes.data;
-    categories.value = categoriesRes.data;
+    const res = await api.get<PaginatedResponse<CategoryResponse>>('/categories', { params: { page: 1, limit: 100 } });
+    categories.value = res.data.data;
   } catch (e) {
-    console.error('Erro ao carregar transações:', e);
-    showSnackbar('Erro ao carregar transações', SnackbarColor.ERROR);
-  } finally {
-    loading.value = false;
+    console.error('Erro ao carregar categorias:', e);
   }
 }
 
@@ -226,7 +222,7 @@ async function onSaved(): Promise<void> {
   const wasEditing = editingExpense.value !== null;
   formDialog.value = false;
   showSnackbar(wasEditing ? 'Transação atualizada com sucesso' : 'Transação criada com sucesso');
-  await fetchData();
+  await fetchPage();
 }
 
 async function onDeleteConfirmed(): Promise<void> {
@@ -237,7 +233,7 @@ async function onDeleteConfirmed(): Promise<void> {
     await api.delete(`/expenses/${deletingExpense.value.id}`);
     deleteDialog.value = false;
     showSnackbar('Transação excluída com sucesso');
-    await fetchData();
+    await fetchPage();
   } catch (e) {
     console.error('Erro ao excluir transação:', e);
     showSnackbar('Erro ao excluir transação', SnackbarColor.ERROR);
@@ -245,5 +241,7 @@ async function onDeleteConfirmed(): Promise<void> {
 }
 
 // ─── Init ────────────────────────────────────────────
-onMounted(fetchData);
+onMounted(async () => {
+  await Promise.all([fetchPage(), fetchCategories()]);
+});
 </script>

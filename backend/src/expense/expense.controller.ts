@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ExpenseCreateDto } from './dto/create-expense.dto';
@@ -7,6 +7,8 @@ import { Expense } from './entities/expense.entity';
 import { CurrentUserId } from '../common/decorators/current-user-id.decorator';
 import { ExpensePatchDto } from './dto/patch-expense.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @Controller('expenses')
 @ApiTags('Expenses')
@@ -28,11 +30,14 @@ export class ExpenseController {
   }
 
   @Get()
-  @ApiOkResponse({ type: Array<ExpenseResponseDto> })
-  public async findAll(@CurrentUserId() userId: string,
-  ): Promise<Array<ExpenseResponseDto>> {
-    const expenses: Array<Expense> = await this.expenseService.findAll(userId);
-    return expenses.map(expense => new ExpenseResponseDto(expense));
+  @ApiOkResponse({ type: PaginatedResponseDto<ExpenseResponseDto> })
+  public async findAll(
+    @CurrentUserId() userId: string,
+    @Query() paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<ExpenseResponseDto>> {
+    const [expenses, total]: [Array<Expense>, number] = await this.expenseService.findAll(userId, paginationQuery);
+    const data: Array<ExpenseResponseDto> = expenses.map(expense => new ExpenseResponseDto(expense));
+    return new PaginatedResponseDto(data, total, paginationQuery.page, paginationQuery.limit);
   }
 
   @Get(':id')

@@ -8,8 +8,8 @@
 
     <CategoriesTable
       v-else
-      :categories="paginatedCategories"
-      :total-items="filteredCategories.length"
+      :categories="filteredCategories"
+      :total-items="total"
       v-model:current-page="currentPage"
       :items-per-page="itemsPerPage"
       @edit="openEdit"
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import type { CategoryResponse } from '~/types/category'
+import type { PaginatedResponse } from '~/types/pagination'
 import CategoriesHeader from '~/components/categories/header/CategoriesHeader.vue'
 import CategoriesFilters from '~/components/categories/filter/CategoriesFilters.vue'
 import CategoriesTable from '~/components/categories/table/CategoriesTable.vue'
@@ -52,58 +53,40 @@ definePageMeta({ layout: 'app' });
 const api = useApi();
 const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
-// ─── State ───────────────────────────────────────────
-const loading = ref<boolean>(true);
-const allCategories = ref<Array<CategoryResponse>>([]);
-
-// Filters
+// ─── Filters ─────────────────────────────────────────
 const search = ref<string>('');
 
-// Dialogs
+// ─── Dialogs ─────────────────────────────────────────
 const formDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const editingCategory = ref<CategoryResponse | null>(null);
 const deletingCategory = ref<CategoryResponse | null>(null);
 
-// ─── Derived: sorted + filtered ──────────────────────
-const sortedCategories = computed(() => {
-  return [...allCategories.value].sort((a, b) => a.name.localeCompare(b.name))
-});
-
-const filteredCategories = computed(() => {
-  let result: Array<CategoryResponse> = sortedCategories.value
-
-  const query: string = search.value.trim().toLowerCase();
-  if (query) {
-    result = result.filter(c => c.name.toLowerCase().includes(query))
-  }
-
-  return result;
-});
-
-// Pagination
-const { currentPage, itemsPerPage, paginatedItems: paginatedCategories, resetPage } = usePagination(filteredCategories);
-
-// Reset page on filter change
-watch(
-  () => search.value.trim(),
-  () => { resetPage() },
-  { flush: 'sync' },
+// ─── Server-Side Pagination ──────────────────────────
+const { items: categories, currentPage, itemsPerPage, total, loading, fetchPage } = usePagination<CategoryResponse>(
+  async (page: number, limit: number) => {
+    const res = await api.get<PaginatedResponse<CategoryResponse>>('/categories', { params: { page, limit } });
+    return res.data;
+  },
 );
 
-// ─── API ─────────────────────────────────────────────
-async function fetchData(): Promise<void> {
-  loading.value = true;
-  try {
-    const res = await api.get<Array<CategoryResponse>>('/categories');
-    allCategories.value = res.data;
-  } catch (e) {
-    console.error('Erro ao carregar categorias:', e);
-    showSnackbar('Erro ao carregar categorias', SnackbarColor.ERROR);
-  } finally {
-    loading.value = false;
-  }
-}
+// ─── Local Search Filter (current page) ──────────────
+const filteredCategories = computed(() => {
+  const query: string = search.value.trim().toLowerCase();
+  if (!query) return categories.value;
+  return categories.value.filter(c => c.name.toLowerCase().includes(query));
+});
+
+// Reset to page 1 on filter change
+watch(
+  () => search.value.trim(),
+  () => {
+    if (currentPage.value !== 1) {
+      currentPage.value = 1;
+    }
+  },
+  { flush: 'sync' },
+);
 
 // ─── Dialog Actions ──────────────────────────────────
 function openCreate(): void {
@@ -125,7 +108,7 @@ async function onSaved(): Promise<void> {
   const wasEditing = editingCategory.value !== null;
   formDialog.value = false;
   showSnackbar(wasEditing ? 'Categoria atualizada com sucesso' : 'Categoria criada com sucesso');
-  await fetchData();
+  await fetchPage();
 }
 
 async function onDeleteConfirmed(): Promise<void> {
@@ -136,7 +119,7 @@ async function onDeleteConfirmed(): Promise<void> {
     await api.delete(`/categories/${deletingCategory.value.id}`);
     deleteDialog.value = false;
     showSnackbar('Categoria excluída com sucesso');
-    await fetchData();
+    await fetchPage();
   } catch (e) {
     console.error('Erro ao excluir categoria:', e);
     showSnackbar('Erro ao excluir categoria', SnackbarColor.ERROR);
@@ -144,5 +127,5 @@ async function onDeleteConfirmed(): Promise<void> {
 }
 
 // ─── Init ────────────────────────────────────────────
-onMounted(fetchData);
+onMounted(fetchPage);
 </script>

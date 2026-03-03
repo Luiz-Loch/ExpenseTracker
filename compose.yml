@@ -61,11 +61,9 @@ services:
     container_name: frontend_app
     restart: always
     environment:
-      - NUXT_PUBLIC_API_BASE_URL=http://${BACKEND_HOST}:${COMPOSE_BACKEND_PORT}
+      - NUXT_PUBLIC_API_BASE_URL=${BACKEND_ENDPOINT}
     ports:
       - "${COMPOSE_FRONTEND_PORT}:3000"
-    networks:
-      - default
     depends_on:
       backend:
         condition: service_healthy

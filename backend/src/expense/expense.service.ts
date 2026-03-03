@@ -12,6 +12,7 @@ import { ExpenseCreateValidator } from './validations/create/expense-create.vali
 import { ExpenseUpdateValidator } from './validations/update/expense-update.validator';
 import { CurrencyConfig } from '../common/money/money.util';
 import { ExpensePatch } from './types/patch-expense.type';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 @Injectable()
 export class ExpenseService {
@@ -63,8 +64,8 @@ export class ExpenseService {
     return this.expenseRepository.save(expense);
   }
 
-  public async findAll(userId: string): Promise<Array<Expense>> {
-    return this.expenseRepository.find({
+  public async findAll(userId: string, paginationQuery: PaginationQueryDto): Promise<[Array<Expense>, number]> {
+    return this.expenseRepository.findAndCount({
       where: {
         user: { id: userId },
       },
@@ -72,6 +73,9 @@ export class ExpenseService {
         category: true,
         user: true,
       },
+      order: { spentAt: 'DESC' },
+      skip: (paginationQuery.page - 1) * paginationQuery.limit,
+      take: paginationQuery.limit,
     });
   }
 

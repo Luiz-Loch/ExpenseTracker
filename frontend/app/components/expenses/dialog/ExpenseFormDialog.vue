@@ -99,7 +99,7 @@ import { ExpenseType, type ExpenseResponse, type CreateExpenseRequest, type Patc
 import type { CategoryResponse } from '~/types/category'
 import AppDialog from '~/components/common/AppDialog.vue'
 
-const api = useApi();
+const expenseService = useExpenseService();
 
 const props = defineProps<{
   modelValue: boolean,
@@ -191,7 +191,7 @@ async function save() {
         categoryId: form.value.categoryId ?? null,
         description: form.value.description?.trim() || null,
       }
-      await api.patch(`/expenses/${props.expense!.id}`, payload);
+      await expenseService.update(props.expense!.id, payload);
     } else {
       const payload: CreateExpenseRequest = {
         name: form.value.name.trim(),
@@ -202,7 +202,7 @@ async function save() {
       if (form.value.categoryId) payload.categoryId = form.value.categoryId;
       if (form.value.description?.trim()) payload.description = form.value.description.trim();
 
-      await api.post('/expenses', payload);
+      await expenseService.create(payload);
     }
 
     emit('saved');

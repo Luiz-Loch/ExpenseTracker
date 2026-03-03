@@ -22,7 +22,6 @@ import { ref, onMounted } from 'vue'
 import type { MonthlyDataPoint } from '~/components/dashboard/chart/cards/DashboardMonthlyChart.vue';
 import type { ExpenseResponse } from '~/types/expense'
 import type { MonthlyReportResponse, SummaryReportResponse } from '~/types/report'
-import type { PaginatedResponse } from '~/types/pagination'
 import DashboardHeader from '~/components/dashboard/header/DashboardHeader.vue'
 import DashboardSummaryCards from '~/components/dashboard/summary/DashboardSummaryCards.vue'
 import DashboardCharts from '~/components/dashboard/chart/DashboardCharts.vue'
@@ -31,7 +30,8 @@ import AppLoading from '~/components/common/AppLoading.vue'
 
 definePageMeta({ layout: 'app' });
 
-const api = useApi();
+const reportService = useReportService();
+const expenseService = useExpenseService();
 
 // ─── State ───────────────────────────────────────────
 const loading = ref(true);
@@ -97,17 +97,17 @@ const currentMonthLabel = computed(() => {
 
 // ─── API helpers ─────────────────────────────────────
 async function fetchSummary(range: { from: string; to: string }): Promise<SummaryReportResponse> {
-  const res = await api.get<SummaryReportResponse>('/reports/summary', { params: range });
+  const res = await reportService.summary(range);
   return res.data;
 }
 
 async function fetchRecentExpenses(): Promise<Array<ExpenseResponse>> {
-  const res = await api.get<PaginatedResponse<ExpenseResponse>>('/expenses', { params: { page: 1, limit: 5 } });
+  const res = await expenseService.list({ page: 1, limit: 5 });
   return res.data.data ?? [];
 }
 
 async function fetchMonthlyReport(year: number): Promise<MonthlyReportResponse> {
-  const res = await api.get<MonthlyReportResponse>('/reports/monthly', { params: { year } });
+  const res = await reportService.monthly(year);
   return res.data;
 }
 

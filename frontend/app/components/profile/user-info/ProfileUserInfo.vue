@@ -67,7 +67,7 @@ const emit = defineEmits<{
   saved: [user: UserResponse],
 }>();
 
-const api = useApi();
+const userService = useUserService();
 const { rules } = useFormRules();
 
 // ─── Form State ──────────────────────────────────────
@@ -104,7 +104,7 @@ async function save(): Promise<void> {
   saving.value = true;
   try {
     const payload: PatchUserRequest = { name: form.value.name };
-    const res = await api.patch<UserResponse>('/users/me', payload);
+    const res = await userService.updateMe(payload);
     emit('saved', res.data);
   } catch (e: any) {
     console.error('Erro ao atualizar nome:', e);

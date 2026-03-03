@@ -91,7 +91,7 @@ import { ref, computed, watch } from 'vue'
 import type { CategoryResponse, CreateCategoryRequest, PatchCategoryRequest } from '~/types/category'
 import AppDialog from '~/components/common/AppDialog.vue'
 
-const api = useApi();
+const categoryService = useCategoryService();
 
 const props = defineProps<{
   modelValue: boolean,
@@ -168,13 +168,13 @@ async function save() {
         name: form.value.name.trim(),
         color: form.value.color ?? null,
       };
-      await api.patch(`/categories/${props.category!.id}`, payload);
+      await categoryService.update(props.category!.id, payload);
     } else {
       const payload: CreateCategoryRequest = {
         name: form.value.name.trim(),
         color: form.value.color ?? null,
       };
-      await api.post('/categories', payload);
+      await categoryService.create(payload);
     }
 
     emit('saved');

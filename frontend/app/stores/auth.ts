@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { LoginPayload, AuthResponse, RegisterPayload } from '../types/auth'
+import type { LoginPayload, RegisterPayload } from '../types/auth'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -12,9 +12,9 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async login(payload: LoginPayload): Promise<void> {
-      const { $api } = useNuxtApp()
+      const authService = useAuthService()
 
-      const { data } = await $api.post<AuthResponse>('/auth/login', payload);
+      const { data } = await authService.login(payload);
 
       this.token = data.accessToken
 
@@ -24,9 +24,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async register(payload: RegisterPayload): Promise<void> {
-      const { $api } = useNuxtApp()
+      const authService = useAuthService()
 
-      const { data } = await $api.post<AuthResponse>('/auth/register', payload);
+      const { data } = await authService.register(payload);
 
       this.token = data.accessToken
 

@@ -54,7 +54,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { ExpenseType, Period, type ExpenseResponse } from '~/types/expense'
 import type { CategoryResponse } from '~/types/category'
-import type { PaginatedResponse } from '~/types/pagination'
 import ExpensesHeader from '~/components/expenses/header/ExpensesHeader.vue'
 import ExpensesFilters from '~/components/expenses/filter/ExpensesFilters.vue'
 import ExpensesSummaryCards from '~/components/expenses/summary/ExpensesSummaryCards.vue'
@@ -65,7 +64,8 @@ import AppLoading from '~/components/common/AppLoading.vue'
 
 definePageMeta({ layout: 'app' });
 
-const api = useApi();
+const expenseService = useExpenseService();
+const categoryService = useCategoryService();
 const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
 // ─── State ───────────────────────────────────────────
@@ -85,7 +85,7 @@ const deletingExpense = ref<ExpenseResponse | null>(null);
 // ─── Server-Side Pagination ──────────────────────────
 const { items: expenses, currentPage, itemsPerPage, total, loading, fetchPage } = usePagination<ExpenseResponse>(
   async (page: number, limit: number) => {
-    const res = await api.get<PaginatedResponse<ExpenseResponse>>('/expenses', { params: { page, limit } });
+    const res = await expenseService.list({ page, limit });
     return res.data;
   },
 );
@@ -195,7 +195,7 @@ watch(
 // ─── API ─────────────────────────────────────────────
 async function fetchCategories(): Promise<void> {
   try {
-    const res = await api.get<PaginatedResponse<CategoryResponse>>('/categories', { params: { page: 1, limit: 100 } });
+    const res = await categoryService.list({ page: 1, limit: 100 });
     categories.value = res.data.data;
   } catch (e) {
     console.error('Erro ao carregar categorias:', e);
@@ -230,7 +230,7 @@ async function onDeleteConfirmed(): Promise<void> {
     return;
   }
   try {
-    await api.delete(`/expenses/${deletingExpense.value.id}`);
+    await expenseService.remove(deletingExpense.value.id);
     deleteDialog.value = false;
     showSnackbar('Transação excluída com sucesso');
     await fetchPage();

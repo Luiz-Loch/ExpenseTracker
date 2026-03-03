@@ -1,4 +1,5 @@
-import type { CategoryResponse, Currency } from "./expense"
+import type { CategoryResponse } from "./category"
+import type { Currency } from "./expense"
 
 export type TotalsResponse = {
   income: number

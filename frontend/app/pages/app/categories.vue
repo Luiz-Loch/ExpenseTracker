@@ -40,7 +40,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import type { CategoryResponse } from '~/types/category'
-import type { PaginatedResponse } from '~/types/pagination'
 import CategoriesHeader from '~/components/categories/header/CategoriesHeader.vue'
 import CategoriesFilters from '~/components/categories/filter/CategoriesFilters.vue'
 import CategoriesTable from '~/components/categories/table/CategoriesTable.vue'
@@ -50,7 +49,7 @@ import AppLoading from '~/components/common/AppLoading.vue'
 
 definePageMeta({ layout: 'app' });
 
-const api = useApi();
+const categoryService = useCategoryService();
 const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
 // ─── Filters ─────────────────────────────────────────
@@ -65,7 +64,7 @@ const deletingCategory = ref<CategoryResponse | null>(null);
 // ─── Server-Side Pagination ──────────────────────────
 const { items: categories, currentPage, itemsPerPage, total, loading, fetchPage } = usePagination<CategoryResponse>(
   async (page: number, limit: number) => {
-    const res = await api.get<PaginatedResponse<CategoryResponse>>('/categories', { params: { page, limit } });
+    const res = await categoryService.list({ page, limit });
     return res.data;
   },
 );
@@ -116,7 +115,7 @@ async function onDeleteConfirmed(): Promise<void> {
     return;
   }
   try {
-    await api.delete(`/categories/${deletingCategory.value.id}`);
+    await categoryService.remove(deletingCategory.value.id);
     deleteDialog.value = false;
     showSnackbar('Categoria excluída com sucesso');
     await fetchPage();

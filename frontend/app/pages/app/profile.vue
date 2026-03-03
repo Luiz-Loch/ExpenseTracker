@@ -37,7 +37,7 @@ import ProfileDangerZone from '~/components/profile/danger-zone/ProfileDangerZon
 
 definePageMeta({ layout: 'app' });
 
-const api = useApi();
+const userService = useUserService();
 const { snackbar, showSnackbar, SnackbarColor } = useSnackbar();
 
 // ─── State ───────────────────────────────────────────
@@ -48,7 +48,7 @@ const user = ref<UserResponse | null>(null);
 async function fetchUser(): Promise<void> {
   loading.value = true;
   try {
-    const res = await api.get<UserResponse>('/users/me');
+    const res = await userService.getMe();
     user.value = res.data;
   } catch (e) {
     console.error('Erro ao carregar perfil:', e);

@@ -72,7 +72,7 @@ const emit = defineEmits<{
   saved: [],
 }>();
 
-const api = useApi();
+const userService = useUserService();
 
 const newPasswordRef = computed(() => form.value.newPassword);
 const { rules } = useFormRules({ password: newPasswordRef });
@@ -102,7 +102,7 @@ async function save(): Promise<void> {
       oldPassword: form.value.oldPassword,
       newPassword: form.value.newPassword,
     };
-    await api.patch('/users/me/password', payload);
+    await userService.changePassword(payload);
     form.value = { oldPassword: '', newPassword: '', confirmPassword: '' };
     formRef.value?.reset();
     emit('saved');

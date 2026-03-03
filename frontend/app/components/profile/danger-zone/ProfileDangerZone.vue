@@ -40,14 +40,14 @@ const emit = defineEmits<{
   error: [message: string]
 }>();
 
-const api = useApi();
+const userService = useUserService();
 const auth = useAuthStore();
 
 const deleteDialog = ref<boolean>(false);
 
 async function onDeleteConfirmed(): Promise<void> {
   try {
-    await api.delete('/users/me');
+    await userService.deleteMe();
     auth.logout();
     await navigateTo('/auth/login');
   } catch (e: any) {

@@ -21,8 +21,7 @@ export class UserController {
   public constructor(
     private readonly userService: UserService,
 
-    @Inject(CACHE_MANAGER)
-    private readonly cache: Cache,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) { }
 
   private userCacheKey(id: string): string {
@@ -36,10 +35,8 @@ export class UserController {
     const cached: UserResponseDto | undefined = await this.cache.get<UserResponseDto>(cacheKey);
 
     if (cached) {
-      console.log('Cache hit for user:', id);
       return cached;
     }
-    console.log('Cache miss for user:', id);
 
     const user: User = await this.userService.findOne(id);
     const response: UserResponseDto = new UserResponseDto(user);

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Inject } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryCreateDto } from './dto/create-category.dto';
 import { CategoryPatchDto } from './dto/patch-category.dto';
@@ -9,15 +9,26 @@ import { Category } from './entities/category.entity';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Controller('categories')
 @ApiTags('Categories')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('bearer')
 export class CategoryController {
+
+  private static readonly CACHE_KEY_PREFIX: string = 'category:';
+
   constructor(
     private readonly categoryService: CategoryService,
+
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) { }
+
+  private categoryCacheKey(userId: string, categoryId: string): string {
+    return `${CategoryController.CACHE_KEY_PREFIX}${userId}:${categoryId}`;
+  }
 
   @Post()
   @ApiOkResponse({ type: CategoryResponseDto })
@@ -46,8 +57,17 @@ export class CategoryController {
     @CurrentUserId() userId: string,
     @Param('id') id: string,
   ): Promise<CategoryResponseDto> {
+    const cacheKey: string = this.categoryCacheKey(userId, id);
+    const cached: CategoryResponseDto | undefined = await this.cache.get(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
     const category: Category = await this.categoryService.findOne(userId, id);
-    return new CategoryResponseDto(category);
+    const response: CategoryResponseDto = new CategoryResponseDto(category);
+    await this.cache.set(cacheKey, response);
+    return response;
   }
 
   @Patch(':id')
@@ -57,6 +77,7 @@ export class CategoryController {
     @Param('id') id: string,
     @Body() categoryPatchDto: CategoryPatchDto,
   ): Promise<CategoryResponseDto> {
+    await this.cache.del(this.categoryCacheKey(userId, id));
     const category: Category = await this.categoryService.update(userId, id, categoryPatchDto);
     return new CategoryResponseDto(category);
   }
@@ -66,6 +87,7 @@ export class CategoryController {
     @CurrentUserId() userId: string,
     @Param('id') id: string,
   ): Promise<void> {
+    await this.cache.del(this.categoryCacheKey(userId, id));
     return await this.categoryService.remove(userId, id);
   }
 }

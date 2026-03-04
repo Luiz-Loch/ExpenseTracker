@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostgresConfigService } from './configuration/postgres.config.service';
 import { AuthModule } from './auth/auth.module';
@@ -8,6 +8,9 @@ import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ReportModule } from './report/report.module';
 import { HealthModule } from './health/health.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Keyv } from 'keyv';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -18,6 +21,21 @@ import { HealthModule } from './health/health.module';
     TypeOrmModule.forRootAsync({
       useClass: PostgresConfigService,
       inject: [PostgresConfigService],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          stores: [
+            new Keyv({
+              store: new KeyvRedis(configService.getOrThrow<string>('REDIS_ENDPOINT')),
+            }),
+          ],
+          ttl: 1 * 60 * 1000, // 1 minute
+        };
+      },
+      inject: [ConfigService],
     }),
     UserModule,
     AuthModule,

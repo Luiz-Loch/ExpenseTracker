@@ -29,7 +29,7 @@ import KeyvRedis from '@keyv/redis';
         return {
           stores: [
             new Keyv({
-              store: new KeyvRedis(configService.getOrThrow<string>('REDIS_ENDPOINT')),
+              store: new KeyvRedis(`redis://${configService.getOrThrow<string>('REDIS_HOST')}:${configService.getOrThrow<string>('REDIS_PORT')}`),
             }),
           ],
           ttl: 1 * 60 * 1000, // 1 minute

@@ -4,10 +4,15 @@ variable "name" {
 }
 
 variable "password_length" {
-  description = "Length of the random password to generate if value is not provided"
+  description = "Length of the random password to generate when value is not provided"
   type        = number
-  default     = 32
-  
+  default     = 128
+}
+
+variable "special" {
+  description = "Whether to include special characters in the generated password"
+  type = bool
+  default = true
 }
 
 variable "parameter_type" {
@@ -21,7 +26,7 @@ variable "parameter_type" {
 }
 
 variable "value" {
-  description = "The value of the parameter. If empty, a random string (32 chars) will be generated"
+  description = "The value of the parameter. If empty, a random password will be generated"
   type        = string
   sensitive   = true
   default     = ""

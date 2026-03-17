@@ -55,6 +55,39 @@ module "backend_config_frontend_endpoint" {
   tags           = local.tags
 }
 
+# Backend - Database Configuration
+module "backend_config_pg_host" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/pg_host"
+  parameter_type = "String"
+  value          = module.rds_postgresql.address
+  tags           = local.tags
+}
+
+module "backend_config_pg_port" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/pg_port"
+  parameter_type = "String"
+  value          = tostring(module.rds_postgresql.port)
+  tags           = local.tags
+}
+
+module "backend_config_pg_database" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/pg_database"
+  parameter_type = "String"
+  value          = module.rds_postgresql.db_name
+  tags           = local.tags
+}
+
+module "backend_config_pg_username" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/pg_username"
+  parameter_type = "String"
+  value          = module.rds_postgresql.username
+  tags           = local.tags
+}
+
 # # Backend - Redis Configuration
 # module "backend_config_redis_host" {
 #   source         = "../../modules/aws/ssm_parameter"
@@ -69,38 +102,5 @@ module "backend_config_frontend_endpoint" {
 #   name           = "/${local.environment}/backend/config/redis_port"
 #   parameter_type = "String"
 #   value          = tostring(module.elasticache_redis.port)
-#   tags           = local.tags
-# }
-
-# # Backend - Database Configuration
-# module "backend_config_pg_host" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/pg_host"
-#   parameter_type = "String"
-#   value          = module.rds_postgresql.address
-#   tags           = local.tags
-# }
-
-# module "backend_config_pg_port" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/pg_port"
-#   parameter_type = "String"
-#   value          = tostring(module.rds_postgresql.port)
-#   tags           = local.tags
-# }
-
-# module "backend_config_pg_database" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/pg_database"
-#   parameter_type = "String"
-#   value          = module.rds_postgresql.db_name
-#   tags           = local.tags
-# }
-
-# module "backend_config_pg_username" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/pg_username"
-#   parameter_type = "String"
-#   value          = module.rds_postgresql.username
 #   tags           = local.tags
 # }

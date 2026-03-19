@@ -17,7 +17,7 @@ module "rds_postgresql" {
   iops                                  = 3000
   storage_encrypted                     = true
   backup_retention_period               = 7
-  skip_final_snapshot                   = false
+  skip_final_snapshot                   = true
   deletion_protection                   = false
   performance_insights_enabled          = false
   performance_insights_retention_period = null

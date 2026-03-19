@@ -3,17 +3,19 @@
 # ============================================================================
 
 module "backend_secret_db_password" {
-  source         = "../../modules/aws/ssm_parameter"
-  name           = "/${local.environment}/backend/secrets/db_password"
-  parameter_type = "SecureString"
-  tags           = local.tags
+  source            = "../../modules/aws/ssm_parameter"
+  name              = "/${local.environment}/backend/secrets/db_password"
+  parameter_type    = "SecureString"
+  generate_password = true
+  tags              = local.tags
 }
 
 module "backend_secret_jwt_secret_key" {
-  source         = "../../modules/aws/ssm_parameter"
-  name           = "/${local.environment}/backend/secrets/jwt_secret_key"
-  parameter_type = "SecureString"
-  tags           = local.tags
+  source            = "../../modules/aws/ssm_parameter"
+  name              = "/${local.environment}/backend/secrets/jwt_secret_key"
+  parameter_type    = "SecureString"
+  generate_password = true
+  tags              = local.tags
 }
 
 # ============================================================================
@@ -88,19 +90,19 @@ module "backend_config_pg_username" {
   tags           = local.tags
 }
 
-# # Backend - Redis Configuration
-# module "backend_config_redis_host" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/redis_host"
-#   parameter_type = "String"
-#   value          = module.elasticache_redis.endpoint
-#   tags           = local.tags
-# }
+# Backend - Redis Configuration
+module "backend_config_redis_host" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/redis_host"
+  parameter_type = "String"
+  value          = module.elasticache_redis.endpoint
+  tags           = local.tags
+}
 
-# module "backend_config_redis_port" {
-#   source         = "../../modules/aws/ssm_parameter"
-#   name           = "/${local.environment}/backend/config/redis_port"
-#   parameter_type = "String"
-#   value          = tostring(module.elasticache_redis.port)
-#   tags           = local.tags
-# }
+module "backend_config_redis_port" {
+  source         = "../../modules/aws/ssm_parameter"
+  name           = "/${local.environment}/backend/config/redis_port"
+  parameter_type = "String"
+  value          = tostring(module.elasticache_redis.port)
+  tags           = local.tags
+}

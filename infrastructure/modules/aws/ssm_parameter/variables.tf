@@ -25,11 +25,17 @@ variable "parameter_type" {
   }
 }
 
+variable "generate_password" {
+  description = "Whether to generate a random password. If false, value must be provided"
+  type        = bool
+  default     = false
+}
+
 variable "value" {
-  description = "The value of the parameter. If empty, a random password will be generated"
+  description = "The value of the parameter. If generate_password is true, this is ignored"
   type        = string
   sensitive   = true
-  default     = ""
+  default     = null
 }
 
 variable "tags" {

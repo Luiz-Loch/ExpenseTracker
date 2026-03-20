@@ -5,7 +5,7 @@ resource "random_password" "this" {
 
   length  = var.password_length
   special = var.special
-  override_special = "!@#$%&-"
+  override_special = "!#$%&"
 }
 
 resource "aws_ssm_parameter" "this" {

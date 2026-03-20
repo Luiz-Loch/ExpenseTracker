@@ -36,6 +36,11 @@ variable "value" {
   type        = string
   sensitive   = true
   default     = null
+
+  validation {
+    condition     = var.generate_password || var.value != null
+    error_message = "Either 'generate_password' must be true or 'value' must be provided."
+  }
 }
 
 variable "tags" {
